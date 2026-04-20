@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CORTEX — Enter the Grid</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+  height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── VIDEO ── */
+video {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* ── CARDS TRAY ── */
+.tray {
+  position: fixed;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 1.5rem;
+  padding: 0 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .tray {
+    flex-direction: column;
+    align-items: center;
+    bottom: 1.5rem;
+    gap: 1rem;
+  }
+}
+
+/* ── CARD ── */
+.gcard {
+  position: relative;
+  width: 280px;
+  padding: 1.75rem 1.5rem;
+  background: rgba(8, 8, 20, 0.82);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  text-decoration: none;
+  color: #fff;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s ease;
+  overflow: visible;
+}
+
+.gcard:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+/* Animated light border — masked to edge */
+.gcard::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 17px;
+  background: conic-gradient(
+    from var(--card-angle, 0deg),
+    transparent 0%,
+    rgba(255,255,255,0.75) 8%,
+    transparent 16%,
+    transparent 50%,
+    rgba(255,255,255,0.45) 58%,
+    transparent 66%
+  );
+  z-index: -1;
+  animation: card-spin 5s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  padding: 2px;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.gcard:hover::before {
+  opacity: 1;
+}
+
+@property --card-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes card-spin {
+  to { --card-angle: 360deg; }
+}
+
+/* Glow line at top */
+.gcard-glow {
+  position: absolute;
+  top: 0; left: 15%; right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  z-index: 2;
+}
+
+.gcard-tag {
+  font-family: 'Courier New', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.35;
+  margin-bottom: 0.75rem;
+}
+
+.gcard-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.6rem;
+  line-height: 1.2;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(255,255,255,0.25);
+}
+
+.gcard-body {
+  font-size: 0.72rem;
+  line-height: 1.7;
+  opacity: 0.55;
+  letter-spacing: 0.02em;
+}
+
+.gcard-arrow {
+  position: absolute;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  font-size: 0.8rem;
+  opacity: 0.3;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.gcard:hover .gcard-arrow {
+  opacity: 0.8;
+  transform: translateX(3px);
+}
+
+/* ── PARTICLES ── */
+.particle-field {
+  position: fixed;
+  bottom: 0; left: 0;
+  width: 100vw;
+  height: 220px;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  animation: float-particle linear infinite;
+}
+
+@keyframes float-particle {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  15% { opacity: 0.6; }
+  85% { opacity: 0.2; }
+  100% {
+    transform: translateY(-160px) translateX(var(--drift));
+    opacity: 0;
+  }
+}
+
+/* ── HOVER SWIRL CANVAS ── */
+#swirlCanvas {
+  position: fixed;
+  bottom: 0; left: 0;
+  width: 100vw;
+  height: 300px;
+  z-index: 6;
+  pointer-events: none;
+}
+
+/* ── NAV ── */
+.grid-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 20;
+  padding: 1.5rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+}
+
+.grid-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: #fff;
+}
+
+.grid-nav-logo {
+  width: 1.5rem; height: 1.5rem;
+  border-radius: 3px;
+  object-fit: cover;
+}
+
+.grid-nav-text {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.grid-nav-back {
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+  opacity: 0.4;
+  transition: opacity 300ms;
+}
+
+.grid-nav-back:hover { opacity: 0.8; }
+</style>
+</head>
+<body>
+
+<!-- VIDEO -->
+<video id="vid" autoplay muted playsinline></video>
+
+<!-- NAV -->
+<nav class="grid-nav">
+  <a href="./index.html" class="grid-nav-brand">
+    <img src="./assets/logos/ibs_mark_only.svg" alt="" class="grid-nav-logo">
+    <span class="grid-nav-text">CORTEX</span>
+  </a>
+  <a href="./index.html" class="grid-nav-back">&larr; Back to CORTEX</a>
+</nav>
+
+<!-- PARTICLES -->
+<div class="particle-field" id="particleField"></div>
+
+<!-- SWIRL CANVAS -->
+<canvas id="swirlCanvas"></canvas>
+
+<!-- CARDS -->
+<div class="tray">
+  <a href="https://logistixibs.com" class="gcard">
+    <div class="gcard-glow"></div>
+    <div class="gcard-tag">Supply Chain</div>
+    <div class="gcard-title">Logistix</div>
+    <div class="gcard-body">On-chain shipment tracking, custody verification, and provenance auditing — all on Base.</div>
+    <div class="gcard-arrow">&rarr;</div>
+  </a>
+
+  <a href="https://innovativeblockchainsolutions.live/imc/" class="gcard">
+    <div class="gcard-glow"></div>
+    <div class="gcard-tag">DeFi Lending</div>
+    <div class="gcard-title">FinTeX</div>
+    <div class="gcard-body">Auto loan origination, USDC vault funding, autonomous DLQ servicing — the full lending stack.</div>
+    <div class="gcard-arrow">&rarr;</div>
+  </a>
+
+  <a href="https://innovativeblockchainsolutions.live/crm/" class="gcard">
+    <div class="gcard-glow"></div>
+    <div class="gcard-tag">Intelligence Layer</div>
+    <div class="gcard-title">CORTEX + IBS</div>
+    <div class="gcard-body">Voice CRM, AI call routing, role-scoped channels, signal scoring — the nerve center of IBS.</div>
+    <div class="gcard-arrow">&rarr;</div>
+  </a>
+</div>
+
+<script>
+// ── HLS VIDEO WITH SMOOTH LOOP ──
+const video = document.getElementById('vid');
+const src = 'https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8';
+
+video.muted = true;
+video.playsInline = true;
+
+let videoPlaying = false;
+
+function tryPlay() {
+  if (videoPlaying) return;
+  video.muted = true;
+  const p = video.play();
+  if (p) p.then(() => { videoPlaying = true; }).catch(() => {});
+}
+
+// Retry every second until video is confirmed playing
+const playCheck = setInterval(() => {
+  if (video.currentTime > 0 && !video.paused) {
+    videoPlaying = true;
+    clearInterval(playCheck);
+  } else {
+    tryPlay();
+  }
+}, 1000);
+
+// Also try on any user interaction
+['click', 'touchstart', 'scroll', 'keydown'].forEach(evt => {
+  document.addEventListener(evt, () => { if (!videoPlaying) tryPlay(); }, { once: true });
+});
+
+if (Hls.isSupported()) {
+  const hls = new Hls({ enableWorker: false, startLevel: 0 });
+  hls.loadSource(src);
+  hls.attachMedia(video);
+  hls.on(Hls.Events.MANIFEST_PARSED, () => tryPlay());
+  hls.on(Hls.Events.ERROR, (e, data) => {
+    if (data.fatal) {
+      if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+        hls.recoverMediaError();
+      } else {
+        hls.destroy();
+        const hls2 = new Hls({ enableWorker: false, startLevel: 0 });
+        hls2.loadSource(src);
+        hls2.attachMedia(video);
+        hls2.on(Hls.Events.MANIFEST_PARSED, () => tryPlay());
+      }
+    }
+  });
+
+  video.addEventListener('timeupdate', () => {
+    if (video.duration && video.currentTime > video.duration - 0.3) {
+      video.currentTime = 0.05;
+      video.play().catch(() => {});
+    }
+  });
+} else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+  video.src = src;
+  video.setAttribute('loop', '');
+  video.addEventListener('loadedmetadata', () => tryPlay());
+}
+
+// ── AMBIENT PARTICLES ──
+const field = document.getElementById('particleField');
+for (let i = 0; i < 60; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.left = Math.random() * 100 + '%';
+  p.style.bottom = Math.random() * 30 + 'px';
+  const size = (0.5 + Math.random() * 1.2) + 'px';
+  p.style.width = size;
+  p.style.height = size;
+  p.style.setProperty('--drift', (Math.random() * 30 - 15) + 'px');
+  p.style.animationDuration = (5 + Math.random() * 8) + 's';
+  p.style.animationDelay = (Math.random() * 10) + 's';
+  p.style.opacity = 0;
+  field.appendChild(p);
+}
+
+// ── HOVER SWIRL PARTICLES ──
+const canvas = document.getElementById('swirlCanvas');
+const ctx = canvas.getContext('2d');
+let mouseX = -1000, mouseY = -1000;
+let swirlers = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = 300;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Swirler {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.angle = Math.random() * Math.PI * 2;
+    this.radius = 10 + Math.random() * 50;
+    this.speed = 0.02 + Math.random() * 0.04;
+    this.size = 0.4 + Math.random() * 0.8;
+    this.life = 1;
+    this.decay = 0.005 + Math.random() * 0.01;
+    this.originX = x;
+    this.originY = y;
+  }
+  update() {
+    this.angle += this.speed;
+    this.x = this.originX + Math.cos(this.angle) * this.radius;
+    this.y = this.originY + Math.sin(this.angle) * this.radius;
+    this.life -= this.decay;
+    this.radius *= 0.998;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y - (window.innerHeight - 300), this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${this.life * 0.6})`;
+    ctx.fill();
+  }
+}
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+
+  if (mouseY > window.innerHeight - 300) {
+    for (let i = 0; i < 3; i++) {
+      swirlers.push(new Swirler(
+        mouseX + (Math.random() - 0.5) * 20,
+        mouseY + (Math.random() - 0.5) * 20
+      ));
+    }
+  }
+});
+
+function animateSwirl() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  swirlers = swirlers.filter(s => s.life > 0);
+  swirlers.forEach(s => { s.update(); s.draw(); });
+  if (swirlers.length > 200) swirlers.splice(0, swirlers.length - 200);
+  requestAnimationFrame(animateSwirl);
+}
+animateSwirl();
+</script>
+</body>
+</html>

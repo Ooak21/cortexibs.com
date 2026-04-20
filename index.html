@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CORTEX — Tactical Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --background: hsl(210, 33%, 19%);
+  --foreground: hsl(0, 0%, 100%);
+  --primary: hsl(199, 89%, 60%);
+  --accent: hsl(199, 89%, 60%);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { overflow: hidden; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 400;
+  color: var(--foreground);
+  background: var(--background);
+  min-height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── VIDEO BACKGROUNDS ── */
+.bg-video {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  object-fit: cover;
+  z-index: -10;
+  transition: opacity 700ms ease;
+  opacity: 0;
+}
+.bg-video.active { opacity: 1; }
+
+.bg-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: -5;
+  background: linear-gradient(180deg, rgba(10,22,40,0.55) 0%, rgba(10,22,40,0.75) 100%);
+  pointer-events: none;
+}
+
+/* ── NAV ── */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 2rem 2.5rem;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nav-logo-img {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.nav-brand-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.nav-brand-text span {
+  color: var(--primary);
+}
+
+.nav-links {
+  display: none;
+  align-items: center;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .nav-links { display: flex; }
+}
+
+.nav-links a {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--foreground);
+  text-decoration: none;
+  opacity: 0.7;
+  transition: opacity 300ms;
+}
+
+.nav-links a:hover { opacity: 1; }
+
+.nav-coords {
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: right;
+  line-height: 1.6;
+  color: #f59e0b;
+  cursor: pointer;
+  opacity: 0;
+  text-shadow: 0 0 0 transparent;
+  animation: neonIgnite 3s 2s ease-out forwards;
+}
+
+@keyframes neonIgnite {
+  0% { opacity: 0; text-shadow: 0 0 0 transparent; }
+  10% { opacity: 0.15; text-shadow: 0 0 2px rgba(245,158,11,0.2); }
+  20% { opacity: 0.05; text-shadow: none; }
+  35% { opacity: 0.3; text-shadow: 0 0 4px rgba(245,158,11,0.3); }
+  40% { opacity: 0.1; text-shadow: none; }
+  55% { opacity: 0.5; text-shadow: 0 0 8px rgba(245,158,11,0.4); }
+  60% { opacity: 0.35; text-shadow: 0 0 4px rgba(245,158,11,0.2); }
+  75% { opacity: 0.7; text-shadow: 0 0 12px rgba(245,158,11,0.5); }
+  85% { opacity: 0.6; text-shadow: 0 0 8px rgba(245,158,11,0.4); }
+  100% { opacity: 1; text-shadow: 0 0 14px rgba(245,158,11,0.5), 0 0 30px rgba(245,158,11,0.15); }
+}
+
+/* ── DECORATIVE LINES ── */
+.deco-line {
+  position: absolute;
+  width: 1px;
+  background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.12) 20%, rgba(255,255,255,0.12) 80%, transparent 100%);
+}
+
+.deco-line-left {
+  left: 2.5rem;
+  top: 1.5rem;
+}
+
+.deco-line-right {
+  right: 2.5rem;
+  top: 1.5rem;
+}
+
+/* ── SECTIONS ── */
+.section-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── SECTION 0 ── */
+.hero-headline {
+  text-align: center;
+  font-size: clamp(1.8rem, 4.8vw, 2.9rem);
+  font-weight: 400;
+  letter-spacing: -0.7px;
+  line-height: 1.02;
+  max-width: 52rem;
+  padding: 0 2rem;
+}
+
+.hero-headline .strike {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  color: rgba(255,255,255,0.5);
+  white-space: nowrap;
+}
+
+.hero-subhead {
+  margin-top: 1.75rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: center;
+  color: #fff;
+}
+
+.hero-subhead .accent {
+  color: var(--primary);
+}
+
+
+.hero-sub {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.hero-bottom {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 2.5rem;
+  right: 2.5rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.scroll-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+  transition: text-shadow 300ms;
+}
+
+.scroll-btn:hover { text-shadow: 0 0 16px rgba(255,255,255,0.7); }
+
+.bounce-icon {
+  display: inline-block;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(6px); }
+  60% { transform: translateY(3px); }
+}
+
+.bottom-logo {
+  width: 2rem;
+  height: 2rem;
+  opacity: 0.6;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+/* ── SECTION 1 ── */
+.s1-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 0 2.5rem;
+  width: 100%;
+  max-width: 80rem;
+}
+
+@media (min-width: 768px) {
+  .s1-layout {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4rem;
+  }
+}
+
+.s1-heading {
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  font-weight: 300;
+  letter-spacing: -2px;
+  line-height: 0.95;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .s1-heading { text-align: left; }
+}
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--foreground);
+  color: var(--background);
+  border: none;
+  border-radius: 9999px;
+  padding: 1rem 2rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 300ms;
+  text-decoration: none;
+}
+
+.cta-btn:hover { transform: scale(1.05); }
+
+.s1-dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.s1-dots-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 0.25rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--foreground);
+}
+
+.dot.filled {
+  background: var(--foreground);
+}
+
+.s1-bottom {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 2.5rem;
+  right: 2.5rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.s1-tagline {
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.8;
+  flex: 1;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+  transition: text-shadow 300ms;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.nav-btn:hover { text-shadow: 0 0 16px rgba(255,255,255,0.7); }
+
+.rotate-up {
+  display: inline-block;
+  transform: rotate(180deg);
+}
+
+/* ── SECTION 2 ── */
+.s2-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+  padding: 0 2rem;
+}
+
+.s2-number {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.s2-heading {
+  font-size: clamp(1.8rem, 4.5vw, 3.75rem);
+  font-weight: 300;
+  letter-spacing: -2px;
+  line-height: 1.05;
+}
+
+.s2-desc {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  max-width: 28rem;
+  line-height: 1.8;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.s2-bottom {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 2.5rem;
+  right: 2.5rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+/* ── HIDDEN ── */
+.hidden { display: none !important; }
+
+/* ── SVG ICONS ── */
+.icon { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── SECTION 2 TEXT FADE ── */
+.s2-content, .s2-bottom {
+  transition: opacity 0.6s ease, filter 0.6s ease;
+}
+.s2-faded .s2-content,
+.s2-faded .s2-bottom {
+  opacity: 0;
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+/* ── AR CONTACT OVERLAY ── */
+.ar-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.ar-overlay.open {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.ar-backdrop {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 8, 20, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.ar-card {
+  position: relative;
+  width: 90%;
+  max-width: 420px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 25, 50, 0.85) 0%,
+    rgba(15, 35, 65, 0.9) 50%,
+    rgba(10, 25, 50, 0.85) 100%
+  );
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 0 30px rgba(255, 255, 255, 0.1),
+    0 0 60px rgba(255, 255, 255, 0.05),
+    0 0 120px rgba(255, 255, 255, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 2.5rem 2rem 2rem;
+  transform: scale(0.85) translateY(40px);
+  filter: blur(12px);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              filter 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: visible;
+}
+
+.ar-overlay.open .ar-card {
+  transform: scale(1) translateY(0);
+  filter: blur(0);
+}
+
+/* Animated light border — masked to edge only */
+.ar-card::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px;
+  right: -2px; bottom: -2px;
+  background: conic-gradient(
+    from var(--light-angle, 0deg),
+    transparent 0%,
+    rgba(255, 255, 255, 0.8) 8%,
+    transparent 16%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.5) 58%,
+    transparent 66%
+  );
+  z-index: -1;
+  border-radius: 3px;
+  animation: borderSpin 4s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  padding: 2px;
+}
+
+@property --light-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --btn-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes borderSpin {
+  to { --light-angle: 360deg; }
+}
+
+/* Scanline effect */
+.ar-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(255, 255, 255, 0.012) 2px,
+    rgba(255, 255, 255, 0.012) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 2px;
+}
+
+/* Corner brackets */
+.ar-corner {
+  position: absolute;
+  width: 16px; height: 16px;
+  border-color: rgba(255, 255, 255, 0.8);
+  border-style: solid;
+  opacity: 0.7;
+  z-index: 3;
+}
+.ar-corner-tl { top: 6px; left: 6px; border-width: 1px 0 0 1px; }
+.ar-corner-tr { top: 6px; right: 6px; border-width: 1px 1px 0 0; }
+.ar-corner-bl { bottom: 6px; left: 6px; border-width: 0 0 1px 1px; }
+.ar-corner-br { bottom: 6px; right: 6px; border-width: 0 1px 1px 0; }
+
+.ar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+  position: relative;
+  z-index: 2;
+}
+
+.ar-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ar-header-logo {
+  width: 1.5rem; height: 1.5rem;
+  border-radius: 3px;
+  object-fit: cover;
+  opacity: 0.8;
+}
+
+.ar-header-title {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.ar-close {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--foreground);
+  width: 28px; height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  opacity: 0.5;
+  transition: opacity 300ms, border-color 300ms;
+  border-radius: 2px;
+}
+.ar-close:hover {
+  opacity: 1;
+  border-color: rgba(255,255,255,0.8);
+  box-shadow: 0 0 8px rgba(255,255,255,0.2);
+}
+
+.ar-label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 0 6px rgba(255,255,255,0.3);
+  margin-bottom: 0.4rem;
+  position: relative;
+  z-index: 2;
+}
+
+.ar-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  padding: 0.65rem 0.8rem;
+  margin-bottom: 1rem;
+  outline: none;
+  transition: border-color 300ms, box-shadow 300ms;
+  position: relative;
+  z-index: 2;
+}
+
+.ar-input:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.1);
+}
+
+.ar-input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+  font-weight: 300;
+}
+
+textarea.ar-input {
+  resize: none;
+  min-height: 70px;
+}
+
+.ar-submit {
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #fff;
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  padding: 0.85rem;
+  cursor: pointer;
+  transition: background 300ms, color 300ms, box-shadow 300ms, text-shadow 300ms;
+  border-radius: 2px;
+  position: relative;
+  z-index: 2;
+  margin-top: 0.25rem;
+  text-shadow: 0 0 8px rgba(255,255,255,0.3);
+  overflow: hidden;
+}
+
+.ar-submit::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px;
+  right: -2px; bottom: -2px;
+  background: conic-gradient(
+    from var(--btn-angle, 0deg),
+    transparent 0%,
+    rgba(255, 255, 255, 0.9) 10%,
+    transparent 20%
+  );
+  z-index: -1;
+  border-radius: 3px;
+  animation: btnSpin 3s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  padding: 2px;
+}
+
+@keyframes btnSpin {
+  to { --btn-angle: 360deg; }
+}
+
+.ar-submit:hover {
+  background: rgba(255, 255, 255, 0.95);
+  color: #0a1932;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 60px rgba(255, 255, 255, 0.1);
+  text-shadow: none;
+}
+
+.ar-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ar-status {
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-align: center;
+  margin-top: 0.75rem;
+  min-height: 1.2em;
+  position: relative;
+  z-index: 2;
+}
+
+.ar-status.success { color: #34d399; }
+.ar-status.error { color: #f87171; }
+
+.ar-sig {
+  font-family: 'Courier New', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 0.25;
+  margin-top: 1.25rem;
+  position: relative;
+  z-index: 2;
+}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND VIDEOS -->
+<video class="bg-video active" id="vid0" autoplay loop muted playsinline src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_190803_f5595254-156c-4d10-ad09-51a56eb4bc1e.mp4"></video>
+<video class="bg-video" id="vid1" autoplay loop muted playsinline src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_204728_2dbcd1c4-63bc-4779-b06c-b7e2d5788ea7.mp4"></video>
+<video class="bg-video" id="vid2" autoplay loop muted playsinline src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_210050_14d4d9cf-782b-4f6f-9764-08d793cf427c.mp4"></video>
+<div class="bg-overlay"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">
+    <img src="./assets/logos/ibs_mark_only.svg" alt="IBS" class="nav-logo-img">
+    <div class="nav-brand-text">Welcome to corte<span>X</span></div>
+  </div>
+  <div class="nav-links">
+    <a href="./intelligence.html">Intelligence</a>
+    <a href="#" onclick="goTo(1)">Channels</a>
+    <a href="#" onclick="goTo(2)">Operations</a>
+  </div>
+  <div class="nav-coords" title="???">
+    37.2325° N<br>
+    109.9943° W
+  </div>
+</nav>
+
+<!-- ═══════════════════ SECTION 0 — HERO ═══════════════════ -->
+<div class="section-container" id="section0">
+  <div class="deco-line deco-line-left" style="height: calc(100% - 3rem);"></div>
+  <div class="deco-line deco-line-right" style="height: calc(100% - 3rem);"></div>
+
+  <h1 class="hero-headline">
+    Stop reshaping your business<br>
+    to fit <span class="strike">their software.</span>
+  </h1>
+  <p class="hero-subhead">CORTEX builds the <span class="accent">landscape</span> around you.</p>
+  <p class="hero-sub" style="margin-top:1.5rem;">Crawls to Your Pace · Scales to Your Ambition</p>
+
+  <div class="hero-bottom">
+    <button class="scroll-btn" onclick="handleNext()">
+      Explore CORTEX
+      <span class="bounce-icon">
+        <svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </span>
+    </button>
+    <img src="./assets/logos/ibs_mark_only.svg" alt="" class="bottom-logo">
+  </div>
+</div>
+
+<!-- ═══════════════════ SECTION 1 — CHANNELS ═══════════════════ -->
+<div class="section-container hidden" id="section1">
+  <div class="s1-layout">
+    <h2 class="s1-heading">
+      Deep Role Based<br>
+      Channel Intelligence
+    </h2>
+    <a href="./grid.html" class="cta-btn">
+      Solutions by Cortex
+      <svg class="icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+    </a>
+  </div>
+
+  <div class="s1-bottom">
+    <button class="nav-btn" onclick="handlePrev()">
+      <span class="rotate-up"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      Back to top
+    </button>
+    <div class="s1-tagline">
+      CORTEX delivers scoped intelligence<br>
+      channels per operator role — every user<br>
+      sees exactly what they need, nothing more
+    </div>
+    <button class="nav-btn" onclick="handleNext()">
+      Next
+      <span class="bounce-icon"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════ SECTION 2 — OPERATIONS ═══════════════════ -->
+<div class="section-container hidden" id="section2">
+  <div class="deco-line deco-line-left" style="height: calc(100% - 1rem);"></div>
+  <div class="deco-line deco-line-right" style="height: calc(100% - 1rem);"></div>
+
+  <div class="s2-content">
+    <div class="s2-number">The SandL0t</div>
+    <h2 class="s2-heading">
+      Autonomous Operational<br>
+      Intelligence Engine
+    </h2>
+    <p class="s2-desc">
+      Per-user AI sandboxes scoped to role and<br>
+      client data. Real-time signal scoring, ATTOM<br>
+      property enrichment, and autonomous<br>
+      outreach — all compartmentalized by channel.
+    </p>
+  </div>
+
+  <div class="s2-bottom">
+    <button class="nav-btn" onclick="handlePrev()">
+      <span class="rotate-up"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      Back
+    </button>
+    <button class="cta-btn" onclick="openAR()">
+      Reach Out
+      <span style="font-size: 1.2em;">+</span>
+    </button>
+    <div style="width: 5rem;"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ AR CONTACT OVERLAY ═══════════════════ -->
+<div class="ar-overlay" id="arOverlay">
+  <div class="ar-backdrop" onclick="closeAR()"></div>
+  <div class="ar-card">
+    <div class="ar-corner ar-corner-tl"></div>
+    <div class="ar-corner ar-corner-tr"></div>
+    <div class="ar-corner ar-corner-bl"></div>
+    <div class="ar-corner ar-corner-br"></div>
+
+    <div class="ar-header">
+      <div class="ar-header-left">
+        <img src="./assets/logos/ibs_mark_only.svg" alt="" class="ar-header-logo">
+        <div class="ar-header-title">Establish Contact</div>
+      </div>
+      <button class="ar-close" onclick="closeAR()">✕</button>
+    </div>
+
+    <div class="ar-label">Callsign</div>
+    <input class="ar-input" type="text" id="arName" placeholder="Your name" autocomplete="name">
+
+    <div class="ar-label">Frequency</div>
+    <input class="ar-input" type="email" id="arEmail" placeholder="your@email.com" autocomplete="email">
+
+    <div class="ar-label">Department</div>
+    <select class="ar-input" id="arDept" style="min-height:auto;">
+      <option value="sales">Logistics / Shipping</option>
+      <option value="ops">Platform / Technical</option>
+      <option value="executive">Partnership / Investment</option>
+      <option value="other">General Inquiry</option>
+    </select>
+
+    <div class="ar-label">Transmission</div>
+    <textarea class="ar-input" id="arMessage" placeholder="What are you building?"></textarea>
+
+    <button class="ar-submit" id="arSubmit" onclick="transmit()">
+      ▸ Transmit
+    </button>
+    <div class="ar-status" id="arStatus"></div>
+    <div class="ar-sig">CORTEX // IBS INTELLIGENCE GRID</div>
+  </div>
+</div>
+
+<script>
+let current = 0;
+const videos = [
+  document.getElementById('vid0'),
+  document.getElementById('vid1'),
+  document.getElementById('vid2')
+];
+const sections = [
+  document.getElementById('section0'),
+  document.getElementById('section1'),
+  document.getElementById('section2')
+];
+
+function goTo(idx) {
+  if (idx === current) return;
+  sections[current].classList.add('hidden');
+  videos[current].classList.remove('active');
+
+  current = idx;
+
+  videos[current].classList.add('active');
+
+  const el = sections[current];
+  el.classList.remove('hidden');
+  el.style.opacity = '0';
+  el.style.transform = current === 0
+    ? 'scale(1.05) translateY(0)'
+    : 'scale(1.08) translateY(80px)';
+  el.style.filter = current === 0 ? 'blur(10px)' : 'blur(14px)';
+
+  requestAnimationFrame(() => {
+    el.style.transition = 'opacity 0.85s cubic-bezier(0.22,1,0.36,1), transform 0.85s cubic-bezier(0.22,1,0.36,1), filter 0.85s cubic-bezier(0.22,1,0.36,1)';
+    el.style.opacity = '1';
+    el.style.transform = 'scale(1) translateY(0)';
+    el.style.filter = 'blur(0)';
+  });
+}
+
+function handleNext() {
+  if (current < 2) goTo(current + 1);
+}
+
+function handlePrev() {
+  if (current > 0) goTo(current - 1);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') handleNext();
+  if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') handlePrev();
+});
+
+let touchStartY = 0;
+document.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; });
+document.addEventListener('touchend', (e) => {
+  const diff = touchStartY - e.changedTouches[0].clientY;
+  if (diff > 50) handleNext();
+  if (diff < -50) handlePrev();
+});
+
+// ── AR CONTACT OVERLAY ──
+const SB_URL  = 'https://jtifhcvbgxqwlywugvjv.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWZoY3ZiZ3hxd2x5d3Vndmp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1MDc5NTgsImV4cCI6MjA4ODA4Mzk1OH0.UfRVLuvM8_HPvKXUEDXb0cxR50znv16L5Tf99AnSc7g';
+
+function openAR() {
+  document.getElementById('section2').classList.add('s2-faded');
+  setTimeout(() => {
+    document.getElementById('arOverlay').classList.add('open');
+  }, 300);
+}
+
+function closeAR() {
+  document.getElementById('arOverlay').classList.remove('open');
+  setTimeout(() => {
+    document.getElementById('section2').classList.remove('s2-faded');
+  }, 400);
+  document.getElementById('arStatus').textContent = '';
+  document.getElementById('arStatus').className = 'ar-status';
+}
+
+async function transmit() {
+  const name    = document.getElementById('arName').value.trim();
+  const email   = document.getElementById('arEmail').value.trim();
+  const dept    = document.getElementById('arDept').value;
+  const message = document.getElementById('arMessage').value.trim();
+  const status  = document.getElementById('arStatus');
+  const btn     = document.getElementById('arSubmit');
+
+  if (!name || !email) {
+    status.textContent = 'CALLSIGN AND FREQUENCY REQUIRED';
+    status.className = 'ar-status error';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '▸ Transmitting...';
+  status.textContent = '';
+
+  const DEPT_MAP = {
+    sales:     { intent: 'SALES',     routed_to: 'moses' },
+    ops:       { intent: 'OPS',       routed_to: 'miguel' },
+    executive: { intent: 'EXECUTIVE', routed_to: 'luis' },
+    other:     { intent: 'OTHER',     routed_to: 'luis' },
+  };
+  const routing = DEPT_MAP[dept] || DEPT_MAP.other;
+
+  try {
+    const res = await fetch(SB_URL + '/functions/v1/cortex-web-intake', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, email, message, dept,
+        intent: routing.intent,
+        routed_to: routing.routed_to,
+        source: 'cortex-landing'
+      })
+    });
+
+    if (res.ok) {
+      status.textContent = 'TRANSMISSION RECEIVED — STAND BY';
+      status.className = 'ar-status success';
+      document.getElementById('arName').value = '';
+      document.getElementById('arEmail').value = '';
+      document.getElementById('arMessage').value = '';
+      setTimeout(closeAR, 2500);
+    } else {
+      throw new Error(res.status);
+    }
+  } catch (e) {
+    status.textContent = 'SIGNAL LOST — TRY AGAIN';
+    status.className = 'ar-status error';
+  }
+
+  btn.disabled = false;
+  btn.textContent = '▸ Transmit';
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeAR();
+});
+</script>
+</body>
+</html>

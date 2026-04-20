@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>corteX — Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue: hsl(199, 89%, 60%);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #080810;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── VIDEO HERO ── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero video {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(180deg, rgba(8,8,16,0.35) 0%, rgba(8,8,16,0.5) 50%, rgba(8,8,16,0.85) 100%);
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 44rem;
+  padding: 0 2rem;
+}
+
+.hero-tag {
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 1.5rem;
+}
+
+.hero-headline {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 300;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  margin-bottom: 1.25rem;
+}
+
+.hero-headline em {
+  font-style: normal;
+  color: var(--blue);
+}
+
+.hero-sub {
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.6);
+  max-width: 32rem;
+  margin: 0 auto 2rem;
+}
+
+.hero-scroll {
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  position: absolute;
+  bottom: 2.5rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hero-scroll .arrow {
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(6px); }
+  60% { transform: translateY(3px); }
+}
+
+/* ── NAV ── */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2.5rem;
+  background: linear-gradient(180deg, rgba(8,8,16,0.7) 0%, transparent 100%);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: #fff;
+}
+
+.nav-logo {
+  width: 1.6rem; height: 1.6rem;
+  border-radius: 3px;
+}
+
+.nav-text {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.nav-text span { color: var(--blue); }
+
+.nav-back {
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #fff;
+  opacity: 0.4;
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+
+.nav-back:hover { opacity: 0.8; }
+
+/* ── CONTENT SECTIONS ── */
+.section {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 5rem 2rem;
+}
+
+.section-num {
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--blue);
+  opacity: 0.6;
+  margin-bottom: 1rem;
+}
+
+.section-heading {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 400;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  margin-bottom: 1.25rem;
+}
+
+.section-body {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 1.5rem;
+}
+
+.section-kicker {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.6;
+}
+
+.divider {
+  width: 40px;
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+  margin: 0 auto;
+}
+
+/* ── PLACEHOLDER ── */
+.placeholder-note {
+  text-align: center;
+  padding: 4rem 2rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.15);
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+/* ── BACK CTA ── */
+.back-cta {
+  text-align: center;
+  padding: 3rem 2rem 5rem;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color 0.3s;
+}
+
+.back-btn:hover { border-color: rgba(255,255,255,0.35); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="./index.html" class="nav-brand">
+    <img src="./assets/logos/ibs_mark_only.svg" alt="" class="nav-logo">
+    <div class="nav-text">corte<span>X</span></div>
+  </a>
+  <a href="./index.html" class="nav-back">&larr; Back to CORTEX</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <video autoplay loop muted playsinline src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260407_043131_ebe2f0b5-9acc-4a4f-b2c1-7297f1a3beb9.mp4"></video>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-tag">CORTEX Intelligence</div>
+    <h1 class="hero-headline">
+      It <em>crawls</em> to your pace.<br>
+      It <em>scales</em> to your ambition.
+    </h1>
+    <p class="hero-sub">
+      CORTEX doesn't force your team into a rigid framework. It maps your operation, learns your rhythm, and builds an intelligence layer that fits — not the other way around.
+    </p>
+  </div>
+  <div class="hero-scroll">
+    How it adapts
+    <span class="arrow">&darr;</span>
+  </div>
+</section>
+
+<!-- SECTION 1 -->
+<div class="section" id="adapt">
+  <div class="section-num">01 — Crawl</div>
+  <h2 class="section-heading">Starts where you are. Not where a product roadmap says you should be.</h2>
+  <p class="section-body">
+    Most platforms demand you reorganize before you can even launch. CORTEX deploys into your existing stack — your CRM, your tools, your workflows — and starts listening. No migration. No rip-and-replace. It meets your team on day one, in the systems they already trust.
+  </p>
+  <p class="section-kicker">Your operation doesn't stop to onboard software. The software onboards to your operation.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION 2 -->
+<div class="section">
+  <div class="section-num">02 — Walk</div>
+  <h2 class="section-heading">Learns your signals. Maps your chain of command.</h2>
+  <p class="section-body">
+    As CORTEX listens, it identifies the signals that matter to each role — what the ops lead needs to see vs. what the CFO cares about. It builds scoped intelligence channels automatically, compartmentalized by role, so every seat gets exactly the data that drives their decisions.
+  </p>
+  <p class="section-kicker">No one-size-fits-all dashboard. Every seat gets a surface built for what they actually do.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION 3 -->
+<div class="section">
+  <div class="section-num">03 — Run</div>
+  <h2 class="section-heading">From listening to acting. Autonomously.</h2>
+  <p class="section-body">
+    Once CORTEX knows your operation, it doesn't wait for you to ask. A deal stalls — it flags it. A shipment deviates — it alerts the right person. A threshold crosses — it triggers the workflow you defined. All within the guardrails you set, all in real time.
+  </p>
+  <p class="section-kicker">You set the lanes. CORTEX drives.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION 4 -->
+<div class="section">
+  <div class="section-num">04 — Scale</div>
+  <h2 class="section-heading">Grows with you without breaking what works.</h2>
+  <p class="section-body">
+    Add a new team. Enter a new vertical. Spin up a new product line. CORTEX extends — new agents, new channels, new signals — without disrupting the intelligence your existing team already relies on. The architecture is compartmentalized by design, so scaling doesn't mean starting over.
+  </p>
+  <p class="section-kicker">One intelligence layer. Every vertical. No ceiling.</p>
+</div>
+
+<!-- PLACEHOLDER -->
+<div class="placeholder-note">
+  Additional content from Miguel incoming — this section will expand
+</div>
+
+<!-- BACK -->
+<div class="back-cta">
+  <a href="./index.html" class="back-btn">&larr; Return to CORTEX</a>
+</div>
+
+</body>
+</html>
