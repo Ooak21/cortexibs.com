@@ -318,7 +318,10 @@ async function toggleVoice() {
         var inp = e.inputBuffer.getChannelData(0);
         var pcm = new Int16Array(inp.length);
         for (var i = 0; i < inp.length; i++) { var s = Math.max(-1, Math.min(1, inp[i])); pcm[i] = s < 0 ? s * 0x8000 : s * 0x7FFF; }
-        voiceWs.send(JSON.stringify({ type: 'input_audio_buffer.append', audio: btoa(String.fromCharCode.apply(null, new Uint8Array(pcm.buffer))) }));
+        var bytes = new Uint8Array(pcm.buffer);
+        var binary = '';
+        for (var j = 0; j < bytes.length; j++) binary += String.fromCharCode(bytes[j]);
+        voiceWs.send(JSON.stringify({ type: 'input_audio_buffer.append', audio: btoa(binary) }));
       };
     };
     voiceWs.onmessage = function(m) {
@@ -326,7 +329,8 @@ async function toggleVoice() {
       if (ev.type === 'response.output_audio.delta' && ev.delta) playChunk(ev.delta);
     };
     voiceWs.onclose = function() { if (voiceActive) stopVoice(); };
-  } catch (e) { console.error(e); btn.classList.remove('active'); }
+    voiceWs.onerror = function(e) { console.error('Voice WS error:', e); stopVoice(); };
+  } catch (e) { console.error('Voice init error:', e); alert('Voice error: ' + e.message); btn.classList.remove('active'); }
 }
 
 function stopVoice() {
