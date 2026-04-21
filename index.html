@@ -171,12 +171,14 @@ body {
   padding: 0 2rem;
 }
 
-.hero-headline .strike {
-  text-decoration: line-through;
-  text-decoration-thickness: 2px;
-  color: rgba(255,255,255,0.5);
-  white-space: nowrap;
-}
+.hero-headline .strike-wrap { position: relative; display: inline-block; white-space: nowrap; }
+.hero-headline .strike-old { position: relative; display: inline; transition: opacity 0.3s; }
+.hero-headline .strike-old .strike-line { position: absolute; left: -2px; right: -2px; top: 50%; height: 2px; background: #fff; transform: scaleX(0); transform-origin: left; transition: none; }
+.hero-headline .strike-old .strike-line.draw { transition: transform 0.6s ease-in-out; transform: scaleX(1); }
+.hero-headline .strike-old.fade { opacity: 0; }
+.hero-headline .strike-new { position: absolute; left: 0; top: 0; display: inline; opacity: 0; color: #fff; font-weight: 600; white-space: nowrap; }
+.hero-headline .strike-new.show { opacity: 1; transition: opacity 0.4s; }
+#heroParticleCanvas { position: absolute; top: -30px; left: -30px; z-index: 5; pointer-events: none; }
 
 .hero-subhead {
   margin-top: 1.75rem;
@@ -804,8 +806,8 @@ textarea.ar-input {
   <div class="deco-line deco-line-right" style="height: calc(100% - 3rem);"></div>
 
   <h1 class="hero-headline">
-    Stop reshaping your business<br>
-    to fit <span class="strike">their software.</span>
+    Reshape your business<br>
+    to fit <span class="strike-wrap" id="strikeWrap"><span class="strike-old" id="strikeOld">their solutions.<span class="strike-line" id="strikeLine"></span></span><span class="strike-new" id="strikeNew">YOUR BUSINESS.</span><canvas id="heroParticleCanvas"></canvas></span>
   </h1>
   <p class="hero-subhead">CORTEX builds the <span class="accent">landscape</span><span class="mobile-break"></span> around you.</p>
   <p class="hero-sub" style="margin-top:1.5rem;">Crawls to Your Pace · Scales to Your Ambition</p>
@@ -1064,6 +1066,109 @@ async function transmit() {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeAR();
 });
+
+// ── HERO STRIKE ANIMATION ──
+(function() {
+  if (window.innerWidth <= 900) return; // desktop only for now
+  var wrap = document.getElementById('strikeWrap');
+  var old = document.getElementById('strikeOld');
+  var line = document.getElementById('strikeLine');
+  var newEl = document.getElementById('strikeNew');
+  var canvas = document.getElementById('heroParticleCanvas');
+  var ctx = canvas.getContext('2d');
+  if (!wrap || !old || !canvas) return;
+
+  function sizeCanvas() {
+    canvas.width = wrap.offsetWidth + 60;
+    canvas.height = wrap.offsetHeight + 60;
+  }
+  sizeCanvas();
+
+  var particles = [];
+  function createParticles() {
+    particles = [];
+    var w = old.offsetWidth;
+    var h = old.offsetHeight;
+    for (var i = 0; i < 1200; i++) {
+      var x = Math.random() * w + 30;
+      var y = Math.random() * h + 30;
+      var angle = Math.random() * Math.PI * 2;
+      var speed = 1.5 + Math.random() * 3;
+      particles.push({ x:x, y:y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, size: 0.3+Math.random()*0.8, alpha: 1 });
+    }
+  }
+
+  function animateDissolve(cb) {
+    var start = performance.now();
+    var dur = 700;
+    function tick(now) {
+      var t = Math.min((now-start)/dur, 1);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(function(p) {
+        p.x += p.vx * (1-t*0.3);
+        p.y += p.vy * (1-t*0.3);
+        p.alpha = Math.min((1-t)*1.5, 1);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(255,255,255,' + p.alpha + ')';
+        ctx.fill();
+      });
+      if (t<1) requestAnimationFrame(tick);
+      else { ctx.clearRect(0,0,canvas.width,canvas.height); if(cb) cb(); }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function animateMaterialize(cb) {
+    var w = newEl.offsetWidth;
+    var h = newEl.offsetHeight;
+    var pts = [];
+    for (var i=0;i<1200;i++) {
+      var hx = Math.random()*w+30;
+      var hy = Math.random()*h+30;
+      var angle = Math.random()*Math.PI*2;
+      var dist = 40+Math.random()*80;
+      pts.push({ homeX:hx, homeY:hy, x:hx+Math.cos(angle)*dist, y:hy+Math.sin(angle)*dist, size:0.3+Math.random()*0.8 });
+    }
+    var start = performance.now();
+    var dur = 500;
+    function tick(now) {
+      var t = Math.min((now-start)/dur, 1);
+      var ease = t*t*(3-2*t);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      pts.forEach(function(p) {
+        var cx = p.x + (p.homeX-p.x)*ease;
+        var cy = p.y + (p.homeY-p.y)*ease;
+        ctx.beginPath();
+        ctx.arc(cx,cy,p.size*(1-ease*0.3),0,Math.PI*2);
+        ctx.fillStyle = 'rgba(255,255,255,' + Math.min(ease*1.5,1) + ')';
+        ctx.fill();
+      });
+      if(t<1) requestAnimationFrame(tick);
+      else { ctx.clearRect(0,0,canvas.width,canvas.height); if(cb) cb(); }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // Sequence: wait 2s → draw strikethrough → dissolve → materialize new text
+  setTimeout(function() {
+    line.classList.add('draw');
+    setTimeout(function() {
+      old.classList.add('fade');
+      sizeCanvas();
+      createParticles();
+      setTimeout(function() {
+        old.style.visibility = 'hidden';
+        animateDissolve(function() {
+          animateMaterialize(function() {
+            newEl.classList.add('show');
+          });
+          setTimeout(function() { newEl.classList.add('show'); }, 200);
+        });
+      }, 300);
+    }, 700);
+  }, 2000);
+})();
 </script>
 </body>
 </html>
