@@ -424,7 +424,7 @@ video {
         p.alpha = 0.8 * (1 - t);
         pctx.beginPath();
         pctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        pctx.fillStyle = 'rgba(255,255,255,' + p.alpha + ')';
+        pctx.fillStyle = 'rgba(255,255,255,' + Math.min(p.alpha * 1.6, 1) + ')';
         pctx.fill();
       });
       if (t < 1) requestAnimationFrame(tick);
@@ -446,7 +446,7 @@ video {
         var alpha = ease * 0.7;
         pctx.beginPath();
         pctx.arc(cx, cy, p.size * (1 - ease * 0.5), 0, Math.PI * 2);
-        pctx.fillStyle = 'rgba(255,255,255,' + alpha + ')';
+        pctx.fillStyle = 'rgba(255,255,255,' + Math.min(alpha * 1.6, 1) + ')';
         pctx.fill();
       });
       if (t < 1) requestAnimationFrame(tick);
