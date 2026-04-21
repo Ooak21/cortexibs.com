@@ -294,16 +294,26 @@ var voiceWs = null, voiceActive = false, voiceCtx = null, voiceMic = null, voice
 async function toggleVoice() {
   if (voiceActive) { stopVoice(); return; }
   var btn = document.getElementById('voiceBtn');
+  var statusMsg = document.getElementById('rexMessages');
   btn.classList.add('active');
   try {
+    var connMsg = document.createElement('div');
+    connMsg.className = 'rex-msg assistant';
+    connMsg.textContent = 'Connecting to voice...';
+    statusMsg.appendChild(connMsg);
+
     var tRes = await fetch(VOICE_TOKEN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
     var tData = await tRes.json();
-    if (!tData.token) { btn.classList.remove('active'); return; }
+    if (!tData.token) { connMsg.textContent = 'Voice error: no token received'; btn.classList.remove('active'); return; }
+    connMsg.textContent = 'Token received. Requesting microphone...';
     voiceMic = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 24000, channelCount: 1 } });
     voiceCtx = new AudioContext({ sampleRate: 24000 });
     voiceWs = new WebSocket('wss://api.x.ai/v1/realtime', ['xai-client-secret.' + tData.token]);
+    connMsg.textContent = 'Microphone active. Connecting to Rex...';
+
     voiceWs.onopen = function() {
       voiceActive = true;
+      connMsg.textContent = 'Connected. Speak now.';
       voiceWs.send(JSON.stringify({ type: 'session.update', session: {
         voice: 'rex',
         instructions: 'You are Rex, an AI business advisor built by Innovative Blockchain Solutions. You are in a live voice conversation with ' + lead.name + ' from ' + (lead.company || 'their company') + '. Their business: ' + (lead.business || lead.use_case || 'financial professional') + '. Their goals: ' + (lead.goals || 'not specified') + '. Their challenges: ' + (lead.hangups || 'not specified') + '.\n\nYou know what is possible because you have seen it built and working: AI receptionists that qualify calls and route by intent. Autonomous outbound voice campaigns with personalized scripts. Client scoring across 10 weighted signals. Automated signal detection for rate drops, equity thresholds, ARM resets. 6-channel content generation with neuro-optimized writing. Voice-activated task assignment. Financial document scanning. Blockchain-verified audit trails with on-chain compliance codes. Smart contract deployment from a dashboard. NFT minting per asset. Custom vault and escrow contracts. Marketplace publishing for investor funding. Autonomous AI agents with their own wallets that sign transactions, send emails, make calls. SMS compliance with TCPA and 10DLC. Reg B adverse action notices. Fiat on-ramp through Coinbase. Data monetization via paid APIs where other agents pay crypto to query your verified data.\n\nRULES: Speak about THEIR business, not product names. Describe outcomes. Never say IMC, PRMG, Illuminate, Sandlot, escrow CRM, DLQ. No hedging. Short punchy sentences. You are a sharp advisor, not a salesperson. If they want an email, tell them to type send me an email in the chat panel on screen.',
@@ -329,8 +339,8 @@ async function toggleVoice() {
       if (ev.type === 'response.output_audio.delta' && ev.delta) playChunk(ev.delta);
     };
     voiceWs.onclose = function() { if (voiceActive) stopVoice(); };
-    voiceWs.onerror = function(e) { console.error('Voice WS error:', e); stopVoice(); };
-  } catch (e) { console.error('Voice init error:', e); alert('Voice error: ' + e.message); btn.classList.remove('active'); }
+    voiceWs.onerror = function(e) { console.error('Voice WS error:', e); connMsg.textContent = 'Voice connection error. Check browser console.'; stopVoice(); };
+  } catch (e) { console.error('Voice init error:', e); connMsg.textContent = 'Voice error: ' + e.message; btn.classList.remove('active'); }
 }
 
 function stopVoice() {
