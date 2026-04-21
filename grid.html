@@ -30,7 +30,7 @@ video {
 /* ── CARDS TRAY ── */
 .tray {
   position: fixed;
-  bottom: 2.5rem;
+  bottom: 3.5rem;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -71,8 +71,9 @@ video {
 /* ── CARD ── */
 .gcard {
   position: relative;
-  width: 280px;
-  padding: 1.75rem 1.5rem;
+  width: 260px;
+  padding: 2.25rem 1.75rem;
+  min-height: 220px;
   background: rgba(8, 8, 20, 0.82);
   backdrop-filter: blur(20px);
   border-radius: 16px;
@@ -149,7 +150,7 @@ video {
 }
 
 .gcard-title {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 500;
   letter-spacing: -0.5px;
   margin-bottom: 0.6rem;
@@ -159,8 +160,8 @@ video {
 }
 
 .gcard-body {
-  font-size: 0.72rem;
-  line-height: 1.7;
+  font-size: 0.75rem;
+  line-height: 1.8;
   opacity: 0.55;
   letter-spacing: 0.02em;
 }
@@ -353,7 +354,7 @@ video {
 
 // ── HLS VIDEO WITH SMOOTH LOOP ──
 const video = document.getElementById('vid');
-const src = 'https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8?v=' + Date.now();
+const src = 'https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8';
 
 video.muted = true;
 video.playsInline = true;
