@@ -31,13 +31,18 @@ video {
 .tray {
   position: fixed;
   bottom: 3.5rem;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
   z-index: 10;
   display: flex;
   gap: 1.5rem;
-  padding: 0 1.5rem;
+  padding: 0 calc(50vw - 150px);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.tray::-webkit-scrollbar { display: none; }
 
 @media (max-width: 900px) {
   .tray {
@@ -71,9 +76,11 @@ video {
 /* ── CARD ── */
 .gcard {
   position: relative;
-  width: 260px;
-  padding: 2.25rem 1.75rem;
-  min-height: 220px;
+  width: 300px;
+  padding: 2.5rem 1.75rem;
+  min-height: 280px;
+  flex-shrink: 0;
+  scroll-snap-align: center;
   background: rgba(8, 8, 20, 0.82);
   backdrop-filter: blur(20px);
   border-radius: 16px;
@@ -181,11 +188,11 @@ video {
 }
 
 /* ── MOBILE DOTS ── */
-.grid-dots { display: none; }
+.grid-dots { display: flex; justify-content: center; gap: 6px; position: fixed; bottom: 1.5rem; left: 0; right: 0; z-index: 15; }
+.gdot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.2s; cursor: pointer; }
+.gdot.active { background: #fff; width: 20px; border-radius: 3px; }
 @media (max-width: 900px) {
-  .grid-dots { display: flex; justify-content: center; gap: 6px; position: fixed; top: calc(50% + 42vw); left: 0; right: 0; z-index: 15; }
-  .gdot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.2s; }
-  .gdot.active { background: #fff; width: 20px; border-radius: 3px; }
+  .grid-dots { bottom: auto; top: calc(50% + 42vw); }
 }
 
 /* ── PARTICLES ── */
@@ -193,7 +200,7 @@ video {
   position: fixed;
   bottom: 0; left: 0;
   width: 100vw;
-  height: 350px;
+  height: 100vh;
   z-index: 5;
   pointer-events: none;
   overflow: hidden;
@@ -214,7 +221,7 @@ video {
   15% { opacity: 0.7; }
   85% { opacity: 0.25; }
   100% {
-    transform: translateY(-280px) translateX(var(--drift));
+    transform: translateY(-70vh) translateX(var(--drift));
     opacity: 0;
   }
 }
