@@ -318,6 +318,7 @@ async function toggleVoice() {
         voice: 'rex',
         instructions: 'You are Rex, an AI business advisor built by Innovative Blockchain Solutions. You are in a live voice conversation with ' + lead.name + ' from ' + (lead.company || 'their company') + '. Their business: ' + (lead.business || lead.use_case || 'financial professional') + '. Their goals: ' + (lead.goals || 'not specified') + '. Their challenges: ' + (lead.hangups || 'not specified') + '.\n\nYou know what is possible because you have seen it built and working: AI receptionists that qualify calls and route by intent. Autonomous outbound voice campaigns with personalized scripts. Client scoring across 10 weighted signals. Automated signal detection for rate drops, equity thresholds, ARM resets. 6-channel content generation with neuro-optimized writing. Voice-activated task assignment. Financial document scanning. Blockchain-verified audit trails with on-chain compliance codes. Smart contract deployment from a dashboard. NFT minting per asset. Custom vault and escrow contracts. Marketplace publishing for investor funding. Autonomous AI agents with their own wallets that sign transactions, send emails, make calls. SMS compliance with TCPA and 10DLC. Reg B adverse action notices. Fiat on-ramp through Coinbase. Data monetization via paid APIs where other agents pay crypto to query your verified data.\n\nRULES: Speak about THEIR business, not product names. Describe outcomes. Never say IMC, PRMG, Illuminate, Sandlot, escrow CRM, DLQ. No hedging. Short punchy sentences. You are a sharp advisor, not a salesperson. If they want an email, tell them to type send me an email in the chat panel on screen.',
         turn_detection: { type: 'server_vad', threshold: 0.8, silence_duration_ms: 800 },
+        input_audio_transcription: { model: 'base' },
         audio: { input: { format: { type: 'audio/pcm', rate: 24000 } }, output: { format: { type: 'audio/pcm', rate: 24000 } } },
       }}));
       var src = voiceCtx.createMediaStreamSource(voiceMic);
@@ -337,6 +338,31 @@ async function toggleVoice() {
     voiceWs.onmessage = function(m) {
       var ev = JSON.parse(m.data);
       if (ev.type === 'response.output_audio.delta' && ev.delta) playChunk(ev.delta);
+      if (ev.type === 'conversation.item.input_audio_transcription.completed' && ev.transcript) {
+        var tb = document.createElement('div');
+        tb.className = 'rex-msg user';
+        tb.textContent = ev.transcript;
+        statusMsg.appendChild(tb);
+        statusMsg.scrollTop = statusMsg.scrollHeight;
+      }
+      if (ev.type === 'response.output_audio_transcript.delta' && ev.delta) {
+        var lastMsg = statusMsg.querySelector('.rex-voice-reply');
+        if (!lastMsg) {
+          lastMsg = document.createElement('div');
+          lastMsg.className = 'rex-msg assistant rex-voice-reply';
+          lastMsg.textContent = '';
+          statusMsg.appendChild(lastMsg);
+        }
+        lastMsg.textContent += ev.delta;
+        statusMsg.scrollTop = statusMsg.scrollHeight;
+      }
+      if (ev.type === 'response.done') {
+        var voiceReply = statusMsg.querySelector('.rex-voice-reply');
+        if (voiceReply) voiceReply.classList.remove('rex-voice-reply');
+      }
+      if (ev.type === 'error') {
+        connMsg.textContent = 'Rex error: ' + (ev.error?.message || JSON.stringify(ev.error));
+      }
     };
     voiceWs.onclose = function() { if (voiceActive) stopVoice(); };
     voiceWs.onerror = function(e) { console.error('Voice WS error:', e); connMsg.textContent = 'Voice connection error. Check browser console.'; stopVoice(); };
@@ -353,6 +379,7 @@ function stopVoice() {
   voiceProc = voiceMic = voiceCtx = voiceWs = null;
 }
 
+var playbackCtx = null;
 function playChunk(b64) { voiceQueue.push(b64); if (!voicePlaying) drainQ(); }
 function drainQ() {
   if (!voiceQueue.length) { voicePlaying = false; return; }
@@ -361,7 +388,8 @@ function drainQ() {
   var bytes = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) bytes[i] = b.charCodeAt(i);
   var pcm = new Int16Array(bytes.buffer);
   var f = new Float32Array(pcm.length); for (var i = 0; i < pcm.length; i++) f[i] = pcm[i] / 32768;
-  var ctx = voiceCtx || new AudioContext({ sampleRate: 24000 });
+  if (!playbackCtx || playbackCtx.state === 'closed') playbackCtx = new AudioContext({ sampleRate: 24000 });
+  var ctx = playbackCtx;
   var buf = ctx.createBuffer(1, f.length, 24000); buf.getChannelData(0).set(f);
   var s = ctx.createBufferSource(); s.buffer = buf; s.connect(ctx.destination);
   s.onended = function() { drainQ(); }; s.start();
