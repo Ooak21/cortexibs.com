@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CORTEX Demo | Innovative Blockchain Solutions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a1628; --navy-deep: #060f1d; --navy-mid: #0f2035; --navy-light: #142a45;
+  --gold: #c9a55c; --gold-light: #dfc07a; --gold-dim: rgba(201,165,92,0.12);
+  --text: #e8e4dc; --text-secondary: #9cadc4; --muted: #5d7290;
+  --white: #ffffff; --green: #34d399; --red: #f87171;
+  --border: rgba(255,255,255,0.06); --radius: 12px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--navy-deep); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; -webkit-font-smoothing: antialiased; }
+
+.card { width: 100%; max-width: 520px; background: var(--navy); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; box-shadow: 0 12px 48px rgba(0,0,0,0.4); }
+
+.brand { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; }
+.brand-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; color: var(--white); }
+.brand-logo span { color: var(--gold); }
+.brand-badge { font-size: 0.4rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); background: var(--gold-dim); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(201,165,92,0.2); }
+
+h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 600; color: var(--white); margin: 0.5rem 0 0.3rem; letter-spacing: -0.01em; }
+.subtitle { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.6; }
+
+/* TABS */
+.tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+.tab { flex: 1; padding: 0.7rem 1rem; font-size: 0.7rem; font-weight: 600; text-align: center; cursor: pointer; background: transparent; border: none; color: var(--muted); transition: all 0.2s; letter-spacing: 0.02em; }
+.tab:first-child { border-right: 1px solid var(--border); }
+.tab.active { color: var(--gold); background: var(--gold-dim); }
+.tab:hover:not(.active) { color: var(--text-secondary); }
+
+.tab-desc { font-size: 0.65rem; color: var(--muted); margin-bottom: 1.25rem; padding: 0.6rem 0.8rem; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid var(--border); line-height: 1.6; }
+.tab-desc strong { color: var(--gold); font-weight: 600; }
+
+/* FORM */
+label { display: block; font-size: 0.55rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+input, textarea { width: 100%; padding: 10px 13px; font-size: 0.8rem; font-family: inherit; color: var(--white); background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; outline: none; transition: border-color 0.15s; }
+input:focus, textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,165,92,0.1); }
+input::placeholder, textarea::placeholder { color: var(--muted); }
+textarea { resize: none; }
+.field { margin-bottom: 0.8rem; }
+
+.phone-field { display: none; }
+.phone-field.show { display: block; }
+
+.tcpa { display: none; margin-bottom: 1rem; }
+.tcpa.show { display: flex; }
+.tcpa { align-items: flex-start; gap: 0.5rem; font-size: 0.6rem; color: var(--muted); line-height: 1.5; }
+.tcpa input[type="checkbox"] { width: auto; margin-top: 2px; accent-color: var(--gold); }
+
+button[type="submit"] { width: 100%; padding: 12px; font-size: 0.85rem; font-weight: 600; font-family: inherit; color: var(--navy-deep); background: linear-gradient(135deg, var(--gold), var(--gold-light)); border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em; }
+button[type="submit"]:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(201,165,92,0.3); }
+button[type="submit"]:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.error { display: none; margin-top: 0.75rem; padding: 0.6rem 0.8rem; font-size: 0.65rem; color: var(--red); background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.15); border-radius: 8px; }
+.error.show { display: block; }
+
+.footer { margin-top: 1.5rem; text-align: center; font-size: 0.5rem; color: rgba(255,255,255,0.2); }
+.footer a { color: var(--gold); text-decoration: none; opacity: 0.6; }
+</style>
+</head>
+<body>
+
+<form class="card" id="demoForm">
+  <div class="brand">
+    <div class="brand-logo">Illuminate <span>Your Wealth</span></div>
+    <div class="brand-badge">CORTEX Demo</div>
+  </div>
+  <h1>Experience the Platform</h1>
+  <p class="subtitle">See how CORTEX transforms client intelligence for financial professionals. Choose your experience level below.</p>
+
+  <div class="tabs">
+    <button type="button" class="tab active" onclick="setMode('full')">Full Experience</button>
+    <button type="button" class="tab" onclick="setMode('limited')">Limited Experience</button>
+  </div>
+
+  <div class="tab-desc" id="modeDesc">
+    <strong>Full Experience:</strong> You'll receive a live AI phone call demonstrating our voice intelligence, then interact with CORTEX to generate a personalized email — delivered to your inbox in real time.
+  </div>
+
+  <div class="field"><label>Name</label><input id="dName" required placeholder="Your full name"></div>
+  <div class="field"><label>Company</label><input id="dCompany" required placeholder="Company or practice name"></div>
+  <div class="field"><label>Email</label><input id="dEmail" type="email" required placeholder="you@company.com"></div>
+
+  <div class="field phone-field show" id="phoneField">
+    <label>Phone</label>
+    <input id="dPhone" type="tel" placeholder="+1 (702) 555-1234">
+  </div>
+
+  <div class="tcpa show" id="tcpaBox">
+    <input type="checkbox" id="dTcpa">
+    <span>I consent to receive a live AI demo call at the number above. Standard rates may apply. This call is for demonstration purposes only.</span>
+  </div>
+
+  <div class="field"><label>What do you do? (brief description)</label><textarea id="dUseCase" rows="2" placeholder="e.g. Loan officer with 200+ clients, looking for automated outreach..."></textarea></div>
+
+  <button type="submit" id="submitBtn">Enter Demo</button>
+  <div class="error" id="error"></div>
+
+  <div class="footer">Innovative Blockchain Solutions · <a href="../grid.html">← Back to Products</a></div>
+</form>
+
+<script>
+var mode = 'full';
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  event.target.classList.add('active');
+
+  var phoneField = document.getElementById('phoneField');
+  var tcpaBox = document.getElementById('tcpaBox');
+  var desc = document.getElementById('modeDesc');
+
+  if (m === 'full') {
+    phoneField.classList.add('show');
+    tcpaBox.classList.add('show');
+    desc.innerHTML = '<strong>Full Experience:</strong> You\'ll receive a live AI phone call demonstrating our voice intelligence, then interact with CORTEX to generate a personalized email — delivered to your inbox in real time.';
+  } else {
+    phoneField.classList.remove('show');
+    tcpaBox.classList.remove('show');
+    desc.innerHTML = '<strong>Limited Experience:</strong> Full CRM access without the phone call. Explore the dashboard, interact with CORTEX voice assistant, and see how the platform works for your business.';
+  }
+}
+
+document.getElementById('demoForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var errorEl = document.getElementById('error');
+  errorEl.classList.remove('show');
+
+  var lead = {
+    name: document.getElementById('dName').value.trim(),
+    company: document.getElementById('dCompany').value.trim(),
+    email: document.getElementById('dEmail').value.trim(),
+    phone: document.getElementById('dPhone').value.trim(),
+    use_case: document.getElementById('dUseCase').value.trim(),
+    mode: mode,
+    tcpa_consent: mode === 'full' ? document.getElementById('dTcpa').checked : false,
+    timestamp: new Date().toISOString(),
+  };
+
+  if (mode === 'full' && !lead.phone) {
+    errorEl.textContent = 'Phone number is required for the Full Experience.';
+    errorEl.classList.add('show');
+    return;
+  }
+  if (mode === 'full' && !lead.tcpa_consent) {
+    errorEl.textContent = 'Please consent to the demo call to continue with Full Experience.';
+    errorEl.classList.add('show');
+    return;
+  }
+
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Setting up your demo...';
+
+  // Store for CRM page
+  sessionStorage.setItem('cortex_demo_lead', JSON.stringify(lead));
+
+  var SB = 'https://jtifhcvbgxqwlywugvjv.supabase.co';
+  var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWZoY3ZiZ3hxd2x5d3Vndmp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1MDc5NTgsImV4cCI6MjA4ODA4Mzk1OH0.UfRVLuvM8_HPvKXUEDXb0cxR50znv16L5Tf99AnSc7g';
+  var headers = {'Content-Type':'application/json','apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Prefer':'return=minimal'};
+
+  // Store in IBS CRM
+  fetch(SB+'/rest/v1/ibs_calls', {method:'POST', headers:headers, body:JSON.stringify({
+    telnyx_call_control_id: 'cortex-demo-'+Date.now(),
+    caller_name: lead.name,
+    caller_email: lead.email,
+    company_name: lead.company,
+    intent_classification: 'SALES',
+    routed_to: 'moses',
+    intent_score: mode === 'full' ? 'HIGH' : 'MEDIUM',
+    classification_reasoning: 'CORTEX demo inquiry ('+mode+' experience) — '+lead.use_case,
+    pre_transfer_summary: lead.name+' from '+lead.company+' entered the CORTEX '+mode+' demo. Use case: '+(lead.use_case||'not specified'),
+    call_status: 'completed',
+    notes: 'SOURCE: CORTEX Demo (cortexibs.com)\nMode: '+mode+'\nPhone: '+(lead.phone||'N/A')+'\nCompany: '+lead.company+'\nEmail: '+lead.email+'\nUse Case: '+(lead.use_case||'N/A')+'\nTCPA Consent: '+lead.tcpa_consent,
+    qualifying_answers: {source:'cortex_demo', mode:mode, company:lead.company, use_case:lead.use_case, phone:lead.phone, tcpa:lead.tcpa_consent},
+    raw_event: {source:'cortex_demo', lead:lead},
+  })}).catch(function(){});
+
+  // If full experience, trigger the demo call
+  if (mode === 'full' && lead.phone) {
+    fetch(SB+'/functions/v1/cortex-demo-call', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:lead.name, phone:lead.phone, company:lead.company, email:lead.email, use_case:lead.use_case}),
+    }).catch(function(){});
+  }
+
+  // Redirect to CRM
+  setTimeout(function() { window.location.href = './crm.html'; }, 1500);
+});
+</script>
+</body>
+</html>
