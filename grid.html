@@ -186,6 +186,18 @@ video {
   transform: translateX(3px);
 }
 
+/* ── CARD INFOGRAPHICS ── */
+.gcard-stats { display: flex; gap: 0.4rem; margin: 0.75rem 0 0.5rem; flex-wrap: wrap; }
+.gcard-stat { padding: 0.25rem 0.5rem; border-radius: 6px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
+.gcard-stat-val { font-size: 0.7rem; font-weight: 700; color: #fff; }
+.gcard-stat-label { font-size: 0.4rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4; }
+.gcard-features { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.6rem; }
+.gcard-feat { display: flex; align-items: center; gap: 0.4rem; font-size: 0.6rem; opacity: 0.5; }
+.gcard-feat-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
+.gcard-mini-flow { display: flex; align-items: center; gap: 0.2rem; margin: 0.6rem 0 0.4rem; }
+.gcard-flow-step { font-size: 0.42rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.2rem 0.35rem; border-radius: 3px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); }
+.gcard-flow-arrow { font-size: 0.5rem; opacity: 0.2; }
+
 /* ── MOBILE DOTS ── */
 .grid-dots { display: flex; justify-content: center; gap: 6px; position: fixed; bottom: 1.5rem; left: 0; right: 0; z-index: 15; }
 .gdot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.2s; cursor: pointer; }
@@ -321,7 +333,17 @@ video {
     <div class="gcard-glow"></div>
     <div class="gcard-tag">Supply Chain</div>
     <div class="gcard-title">Logistix</div>
-    <div class="gcard-body">On-chain shipment tracking, custody verification, and provenance auditing — all on Base.</div>
+    <div class="gcard-body">Real-time cargo tracking with blockchain-verified checkpoints on Base Sepolia.</div>
+    <div class="gcard-stats">
+      <div class="gcard-stat"><div class="gcard-stat-val">3</div><div class="gcard-stat-label">Geofence Anchors</div></div>
+      <div class="gcard-stat"><div class="gcard-stat-val">15s</div><div class="gcard-stat-label">Poll Cycle</div></div>
+      <div class="gcard-stat"><div class="gcard-stat-val">Live</div><div class="gcard-stat-label">Airlabs API</div></div>
+    </div>
+    <div class="gcard-features">
+      <div class="gcard-feat"><div class="gcard-feat-dot" style="background:#60a5fa"></div>Departure geofence exit</div>
+      <div class="gcard-feat"><div class="gcard-feat-dot" style="background:#a78bfa"></div>Midpoint crossing anchor</div>
+      <div class="gcard-feat"><div class="gcard-feat-dot" style="background:#34d399"></div>Arrival geofence entry</div>
+    </div>
     <div class="gcard-arrow">&rarr;</div>
   </a>
 
@@ -329,7 +351,23 @@ video {
     <div class="gcard-glow"></div>
     <div class="gcard-tag">DeFi Lending</div>
     <div class="gcard-title">FinTeX</div>
-    <div class="gcard-body">Auto loan origination, USDC vault funding, autonomous DLQ servicing — the full lending stack.</div>
+    <div class="gcard-body">Full lifecycle auto lending. NFT minting, vault funding, autonomous servicing.</div>
+    <div class="gcard-mini-flow">
+      <span class="gcard-flow-step">Apply</span><span class="gcard-flow-arrow">›</span>
+      <span class="gcard-flow-step">Approve</span><span class="gcard-flow-arrow">›</span>
+      <span class="gcard-flow-step">Mint</span><span class="gcard-flow-arrow">›</span>
+      <span class="gcard-flow-step">Fund</span><span class="gcard-flow-arrow">›</span>
+      <span class="gcard-flow-step">Service</span>
+    </div>
+    <div class="gcard-stats">
+      <div class="gcard-stat"><div class="gcard-stat-val">12</div><div class="gcard-stat-label">Lifecycle Steps</div></div>
+      <div class="gcard-stat"><div class="gcard-stat-val">8</div><div class="gcard-stat-label">DLQ Levels</div></div>
+    </div>
+    <div class="gcard-features">
+      <div class="gcard-feat"><div class="gcard-feat-dot" style="background:#00d4ff"></div>ERC-721 per vehicle</div>
+      <div class="gcard-feat"><div class="gcard-feat-dot" style="background:#f0c040"></div>USDC vault contracts</div>
+      <div class="gcard-feat"><div class="gcard-feat-dot" style="background:#f87171"></div>AI voice collections</div>
+    </div>
     <div class="gcard-arrow">&rarr;</div>
   </a>
 
@@ -337,7 +375,22 @@ video {
     <div class="gcard-glow"></div>
     <div class="gcard-tag">P2P Escrow</div>
     <div class="gcard-title">On-Chain Escrow</div>
-    <div class="gcard-body">Smart contract escrow for high-value assets. USDC deposits, SMS verification, automatic fund release.</div>
+    <div class="gcard-body">Smart contract escrow for high-value assets. SMS + voice verification.</div>
+    <div class="gcard-mini-flow">
+      <span class="gcard-flow-step">List</span><span class="gcard-flow-arrow">›</span>
+      <span class="gcard-flow-step">Deposit</span><span class="gcard-flow-arrow">›</span>
+      <span class="gcard-flow-step">Verify</span><span class="gcard-flow-arrow">›</span>
+      <span class="gcard-flow-step">Release</span>
+    </div>
+    <div class="gcard-stats">
+      <div class="gcard-stat"><div class="gcard-stat-val">2%</div><div class="gcard-stat-label">Platform Fee</div></div>
+      <div class="gcard-stat"><div class="gcard-stat-val">USDC</div><div class="gcard-stat-label">Settlement</div></div>
+    </div>
+    <div class="gcard-features">
+      <div class="gcard-feat"><div class="gcard-feat-dot" style="background:#34d399"></div>Dual-party SMS codes</div>
+      <div class="gcard-feat"><div class="gcard-feat-dot" style="background:#a78bfa"></div>AI voice confirmation</div>
+      <div class="gcard-feat"><div class="gcard-feat-dot" style="background:#f59e0b"></div>Auto-release on confirm</div>
+    </div>
     <div class="gcard-arrow">&rarr;</div>
   </a>
 
@@ -345,7 +398,17 @@ video {
     <div class="gcard-glow"></div>
     <div class="gcard-tag">Intelligence Layer</div>
     <div class="gcard-title">CORTEX + IBS</div>
-    <div class="gcard-body">Voice CRM, AI call routing, role-scoped channels, signal scoring — the nerve center of IBS.</div>
+    <div class="gcard-body">AI-powered client intelligence with autonomous voice and content generation.</div>
+    <div class="gcard-stats">
+      <div class="gcard-stat"><div class="gcard-stat-val">10</div><div class="gcard-stat-label">Scoring Signals</div></div>
+      <div class="gcard-stat"><div class="gcard-stat-val">6</div><div class="gcard-stat-label">Outreach Channels</div></div>
+      <div class="gcard-stat"><div class="gcard-stat-val">Live</div><div class="gcard-stat-label">Voice Agent</div></div>
+    </div>
+    <div class="gcard-features">
+      <div class="gcard-feat"><div class="gcard-feat-dot" style="background:#60a5fa"></div>AI receptionist + call routing</div>
+      <div class="gcard-feat"><div class="gcard-feat-dot" style="background:#34d399"></div>Neuro-scored content engine</div>
+      <div class="gcard-feat"><div class="gcard-feat-dot" style="background:#f0c040"></div>Voice-to-email in 60 seconds</div>
+    </div>
     <div class="gcard-arrow">&rarr;</div>
   </a>
 </div>
