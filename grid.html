@@ -192,7 +192,7 @@ video {
   position: fixed;
   bottom: 0; left: 0;
   width: 100vw;
-  height: 220px;
+  height: 350px;
   z-index: 5;
   pointer-events: none;
   overflow: hidden;
@@ -210,10 +210,10 @@ video {
     transform: translateY(0) translateX(0);
     opacity: 0;
   }
-  15% { opacity: 0.6; }
-  85% { opacity: 0.2; }
+  15% { opacity: 0.7; }
+  85% { opacity: 0.25; }
   100% {
-    transform: translateY(-160px) translateX(var(--drift));
+    transform: translateY(-280px) translateX(var(--drift));
     opacity: 0;
   }
 }
@@ -415,12 +415,12 @@ if (Hls.isSupported()) {
 
 // ── AMBIENT PARTICLES ──
 const field = document.getElementById('particleField');
-for (let i = 0; i < 60; i++) {
+for (let i = 0; i < 120; i++) {
   const p = document.createElement('div');
   p.className = 'particle';
   p.style.left = Math.random() * 100 + '%';
   p.style.bottom = Math.random() * 30 + 'px';
-  const size = (0.5 + Math.random() * 1.2) + 'px';
+  const size = (0.8 + Math.random() * 2) + 'px';
   p.style.width = size;
   p.style.height = size;
   p.style.setProperty('--drift', (Math.random() * 30 - 15) + 'px');
