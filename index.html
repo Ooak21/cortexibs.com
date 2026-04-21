@@ -489,6 +489,28 @@ body {
   .hero-sub { padding: 0 1rem; }
 }
 
+/* ── TABLET (768px - 1024px) ── */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .nav { padding: 1.5rem 1.5rem; }
+  .nav-links { gap: 1.5rem; }
+  .nav-links a { font-size: 0.55rem; }
+  .nav-coords { font-size: 0.5rem; }
+  .section-container { height: 100dvh; }
+  .hero-headline { font-size: clamp(1.6rem, 4vw, 2.4rem); padding: 0 2rem; }
+  .hero-subhead { font-size: 1rem; padding: 0 2rem; }
+  .hero-sub { font-size: 0.65rem; }
+  .hero-bottom { bottom: 3rem; left: 2rem; right: 2rem; }
+  .s1-layout { padding: 0 2rem; gap: 2rem; }
+  .s1-heading { font-size: clamp(1.6rem, 4.5vw, 2.5rem); }
+  .s1-bottom { bottom: 2.5rem; left: 1.5rem; right: 1.5rem; }
+  .s1-tagline { font-size: 0.6rem; letter-spacing: 0.1em; line-height: 1.7; }
+  .s2-content { padding: 0 2rem; }
+  .s2-heading { font-size: clamp(1.6rem, 4.5vw, 2.5rem); }
+  .s2-desc { font-size: 0.7rem; letter-spacing: 0.1em; max-width: 100%; padding: 0 1rem; }
+  .s2-bottom { bottom: 2.5rem; left: 1.5rem; right: 1.5rem; }
+  .bottom-logo { width: 1.5rem; height: 1.5rem; }
+}
+
 /* ── AR CONTACT OVERLAY ── */
 .ar-overlay {
   position: fixed;
@@ -1191,7 +1213,7 @@ document.addEventListener('keydown', (e) => {
 
 // ── HERO STRIKE ANIMATION ──
 (function() {
-  if (window.innerWidth <= 900) return; // desktop only for now
+  if (window.innerWidth <= 600) return; // mobile only skip — tablet + desktop get the animation
   var wrap = document.getElementById('strikeWrap');
   var old = document.getElementById('strikeOld');
   var line = document.getElementById('strikeLine');
