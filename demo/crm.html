@@ -203,7 +203,9 @@ document.getElementById('clientBody').innerHTML =
   '<div class="detail-row"><span class="detail-key">Company</span><span class="detail-val">' + (lead.company || '—') + '</span></div>' +
   '<div class="detail-row"><span class="detail-key">Email</span><span class="detail-val">' + (lead.email || '—') + '</span></div>' +
   (lead.phone ? '<div class="detail-row"><span class="detail-key">Phone</span><span class="detail-val">' + lead.phone + '</span></div>' : '') +
-  '<div class="detail-row"><span class="detail-key">Use Case</span><span class="detail-val">' + (lead.use_case || '—') + '</span></div>' +
+  '<div class="detail-row"><span class="detail-key">Business</span><span class="detail-val">' + (lead.business || lead.use_case || '—') + '</span></div>' +
+  (lead.goals ? '<div class="detail-row"><span class="detail-key">Goals</span><span class="detail-val">' + lead.goals + '</span></div>' : '') +
+  (lead.hangups ? '<div class="detail-row"><span class="detail-key">Challenges</span><span class="detail-val">' + lead.hangups + '</span></div>' : '') +
   '<div class="detail-row"><span class="detail-key">Experience</span><span class="detail-val">' + (isFullMode ? 'Full Experience' : 'Limited Experience') + '</span></div>' +
   '<div class="signals">' +
     '<span class="signal" style="color:var(--gold);background:var(--gold-dim)">New Lead</span>' +
@@ -256,7 +258,7 @@ async function sendRex() {
       var emailRes = await fetch(SB + '/functions/v1/cortex-demo-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: lead.name, email: lead.email, company: lead.company, use_case: lead.use_case, request: msg }),
+        body: JSON.stringify({ name: lead.name, email: lead.email, company: lead.company, use_case: lead.use_case, business: lead.business, goals: lead.goals, hangups: lead.hangups, request: msg }),
       });
       var emailData = await emailRes.json();
       if (emailData.success) {

@@ -97,7 +97,9 @@ button[type="submit"]:disabled { opacity: 0.5; cursor: not-allowed; transform: n
     <span>I consent to receive a live AI demo call at the number above. Standard rates may apply. This call is for demonstration purposes only.</span>
   </div>
 
-  <div class="field"><label>What do you do? (brief description)</label><textarea id="dUseCase" rows="2" placeholder="e.g. Loan officer with 200+ clients, looking for automated outreach..."></textarea></div>
+  <div class="field"><label>What does your business do?</label><textarea id="dBusiness" rows="2" placeholder="e.g. Mortgage brokerage with 6 teams, each with a lead realtor and 3-6 assistants..."></textarea></div>
+  <div class="field"><label>Where do you need to get to?</label><input id="dGoals" placeholder="e.g. Automate client outreach, better pipeline visibility..."></div>
+  <div class="field"><label>What's holding you back?</label><input id="dHangups" placeholder="e.g. Current CRM is outdated, no automation, manual follow-ups..."></div>
 
   <button type="submit" id="submitBtn">Enter Demo</button>
   <div class="error" id="error"></div>
@@ -138,7 +140,10 @@ document.getElementById('demoForm').addEventListener('submit', function(e) {
     company: document.getElementById('dCompany').value.trim(),
     email: document.getElementById('dEmail').value.trim(),
     phone: document.getElementById('dPhone').value.trim(),
-    use_case: document.getElementById('dUseCase').value.trim(),
+    business: document.getElementById('dBusiness').value.trim(),
+    goals: document.getElementById('dGoals').value.trim(),
+    hangups: document.getElementById('dHangups').value.trim(),
+    use_case: [document.getElementById('dBusiness').value.trim(), document.getElementById('dGoals').value.trim(), document.getElementById('dHangups').value.trim()].filter(Boolean).join(' | '),
     mode: mode,
     tcpa_consent: mode === 'full' ? document.getElementById('dTcpa').checked : false,
     timestamp: new Date().toISOString(),
