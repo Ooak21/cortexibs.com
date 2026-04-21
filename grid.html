@@ -41,11 +41,31 @@ video {
 
 @media (max-width: 900px) {
   .tray {
-    flex-direction: column;
+    position: fixed;
+    top: 50%;
+    bottom: auto;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    flex-direction: row;
     align-items: center;
-    bottom: 1.5rem;
-    gap: 1rem;
+    gap: 1.25rem;
+    padding: 0 8vw;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .tray::-webkit-scrollbar { display: none; }
+  .gcard {
+    flex-shrink: 0;
+    width: 82vw;
+    scroll-snap-align: center;
+    padding: 2rem 1.75rem;
+  }
+  .gcard-title { font-size: 1.3rem; }
+  .gcard-body { font-size: 0.78rem; line-height: 1.7; }
+  .gcard-tag { font-size: 0.6rem; margin-bottom: 0.9rem; }
 }
 
 /* ── CARD ── */
@@ -157,6 +177,14 @@ video {
 .gcard:hover .gcard-arrow {
   opacity: 0.8;
   transform: translateX(3px);
+}
+
+/* ── MOBILE DOTS ── */
+.grid-dots { display: none; }
+@media (max-width: 900px) {
+  .grid-dots { display: flex; justify-content: center; gap: 6px; position: fixed; top: calc(50% + 42vw); left: 0; right: 0; z-index: 15; }
+  .gdot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.2s; }
+  .gdot.active { background: #fff; width: 20px; border-radius: 3px; }
 }
 
 /* ── PARTICLES ── */
@@ -303,7 +331,26 @@ video {
   </a>
 </div>
 
+<!-- Mobile dots -->
+<div class="grid-dots" id="gridDots">
+  <span class="gdot active"></span><span class="gdot"></span><span class="gdot"></span><span class="gdot"></span>
+</div>
+
 <script>
+// ── MOBILE CARD DOTS ──
+(function() {
+  var tray = document.querySelector('.tray');
+  var dots = document.querySelectorAll('.gdot');
+  if (!tray || !dots.length) return;
+  tray.addEventListener('scroll', function() {
+    var scrollLeft = tray.scrollLeft;
+    var cardWidth = tray.querySelector('.gcard').offsetWidth;
+    var gap = 20;
+    var idx = Math.round(scrollLeft / (cardWidth + gap));
+    dots.forEach(function(d, i) { d.className = 'gdot' + (i === idx ? ' active' : ''); });
+  });
+})();
+
 // ── HLS VIDEO WITH SMOOTH LOOP ──
 const video = document.getElementById('vid');
 const src = 'https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8?v=' + Date.now();
