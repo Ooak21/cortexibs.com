@@ -442,7 +442,10 @@ body {
 /* ── MOBILE FIXES ── */
 @media (max-width: 767px) {
   .section-container { height: 100dvh; padding-top: 2rem; }
-  .s2-bottom { bottom: 5rem; left: 1.25rem; right: 1.25rem; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+  .s2-content { padding: 0 1.5rem; gap: 1rem; }
+  .s2-heading { font-size: clamp(1.8rem, 6vw, 2.8rem); letter-spacing: -1px; }
+  .s2-desc { font-size: 0.75rem; letter-spacing: 0.08em; line-height: 1.7; max-width: 100%; padding: 0 0.5rem; }
+  .s2-bottom { bottom: 5rem; left: 1.25rem; right: 1.25rem; }
   .s2-bottom > div:last-child { display: none; }
   .cta-btn { padding: 0.85rem 1.5rem; font-size: 0.65rem; }
   .deco-line { display: none !important; }
