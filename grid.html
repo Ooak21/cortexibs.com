@@ -27,25 +27,24 @@ video {
   z-index: 0;
 }
 
-/* ── CARDS TRAY ── */
-.tray {
-  position: fixed;
-  bottom: 3.5rem;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  display: flex;
-  gap: 1.5rem;
-  padding: 0 calc(50vw - 150px);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.tray::-webkit-scrollbar { display: none; }
+/* ── DESKTOP: SINGLE CARD WITH PARTICLE TRANSITION ── */
+.tray { display: none; }
+.card-stage { position: fixed; bottom: 3rem; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.card-holder { position: relative; width: 320px; min-height: 300px; }
+.card-holder .gcard { position: absolute; top: 0; left: 0; width: 100%; opacity: 0; pointer-events: none; transition: none; }
+.card-holder .gcard.visible { opacity: 1; pointer-events: auto; }
+.card-holder .gcard.dissolving { opacity: 0; transition: opacity 0.15s; }
+#particleCanvas { position: absolute; top: -40px; left: -40px; width: calc(100% + 80px); height: calc(100% + 80px); z-index: 20; pointer-events: none; }
+.card-nav { display: flex; align-items: center; gap: 1rem; }
+.card-nav-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); background: rgba(8,8,20,0.6); backdrop-filter: blur(12px); color: #fff; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.card-nav-btn:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.08); }
+.card-explore { font-size: 0.6rem; color: rgba(255,255,255,0.35); letter-spacing: 0.15em; text-transform: uppercase; }
 
+/* ── MOBILE: HORIZONTAL SWIPE (unchanged) ── */
 @media (max-width: 900px) {
+  .card-stage { display: none; }
   .tray {
+    display: flex;
     position: fixed;
     top: 50%;
     bottom: auto;
@@ -304,7 +303,19 @@ video {
 <!-- SWIRL CANVAS -->
 <canvas id="swirlCanvas"></canvas>
 
-<!-- CARDS -->
+<!-- DESKTOP CARD STAGE -->
+<div class="card-stage" id="cardStage">
+  <div class="card-holder" id="cardHolder">
+    <canvas id="particleCanvas"></canvas>
+  </div>
+  <div class="card-nav">
+    <button class="card-nav-btn" onclick="prevCard()">&#8249;</button>
+    <div class="card-explore">Explore Solutions</div>
+    <button class="card-nav-btn" onclick="nextCard()">&#8250;</button>
+  </div>
+</div>
+
+<!-- MOBILE CARDS -->
 <div class="tray">
   <a href="https://logistixibs.com/dashboard.html" class="gcard">
     <div class="gcard-glow"></div>
@@ -345,6 +356,150 @@ video {
 </div>
 
 <script>
+// ── DESKTOP PARTICLE CARD SYSTEM ──
+(function() {
+  if (window.innerWidth <= 900) return;
+  var holder = document.getElementById('cardHolder');
+  var canvas = document.getElementById('particleCanvas');
+  var pctx = canvas.getContext('2d');
+  var cards = document.querySelectorAll('.tray .gcard');
+  var cardData = [];
+  var currentIdx = 0;
+  var animating = false;
+
+  // Clone cards into the holder
+  cards.forEach(function(card, i) {
+    var clone = card.cloneNode(true);
+    clone.className = 'gcard' + (i === 0 ? ' visible' : '');
+    clone.style.position = 'absolute';
+    clone.style.top = '0';
+    clone.style.left = '0';
+    clone.style.width = '100%';
+    holder.appendChild(clone);
+    cardData.push(clone);
+  });
+
+  function resizeCanvas() {
+    canvas.width = holder.offsetWidth + 80;
+    canvas.height = holder.offsetHeight + 80;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  var particles = [];
+
+  function createParticles(dissolve) {
+    particles = [];
+    var w = holder.offsetWidth;
+    var h = holder.offsetHeight;
+    var count = 800;
+    for (var i = 0; i < count; i++) {
+      var x = Math.random() * w;
+      var y = Math.random() * h;
+      var angle = Math.random() * Math.PI * 2;
+      var speed = 1 + Math.random() * 4;
+      var size = 0.5 + Math.random() * 1.5;
+      particles.push({
+        x: x + 40, y: y + 40,
+        homeX: x + 40, homeY: y + 40,
+        vx: Math.cos(angle) * speed * (dissolve ? 1 : -1),
+        vy: Math.sin(angle) * speed * (dissolve ? 1 : -1),
+        size: size,
+        alpha: dissolve ? 0.8 : 0,
+        targetAlpha: dissolve ? 0 : 0.8,
+        life: 1,
+      });
+    }
+  }
+
+  function animateDissolve(callback) {
+    var startTime = performance.now();
+    var duration = 600;
+    function tick(now) {
+      var t = Math.min((now - startTime) / duration, 1);
+      pctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(function(p) {
+        p.x += p.vx * (1 - t * 0.5);
+        p.y += p.vy * (1 - t * 0.5);
+        p.alpha = 0.8 * (1 - t);
+        pctx.beginPath();
+        pctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        pctx.fillStyle = 'rgba(255,255,255,' + p.alpha + ')';
+        pctx.fill();
+      });
+      if (t < 1) requestAnimationFrame(tick);
+      else { pctx.clearRect(0, 0, canvas.width, canvas.height); if (callback) callback(); }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function animateMaterialize(callback) {
+    var startTime = performance.now();
+    var duration = 500;
+    function tick(now) {
+      var t = Math.min((now - startTime) / duration, 1);
+      var ease = t * t * (3 - 2 * t);
+      pctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(function(p) {
+        var cx = p.homeX + (1 - ease) * p.vx * 60;
+        var cy = p.homeY + (1 - ease) * p.vy * 60;
+        var alpha = ease * 0.7;
+        pctx.beginPath();
+        pctx.arc(cx, cy, p.size * (1 - ease * 0.5), 0, Math.PI * 2);
+        pctx.fillStyle = 'rgba(255,255,255,' + alpha + ')';
+        pctx.fill();
+      });
+      if (t < 1) requestAnimationFrame(tick);
+      else { pctx.clearRect(0, 0, canvas.width, canvas.height); if (callback) callback(); }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function showCard(idx) {
+    cardData.forEach(function(c, i) {
+      c.className = 'gcard' + (i === idx ? ' visible' : '');
+    });
+    // Update dots
+    document.querySelectorAll('.gdot').forEach(function(d, i) {
+      d.className = 'gdot' + (i === idx ? ' active' : '');
+    });
+  }
+
+  function transitionTo(idx) {
+    if (animating || idx === currentIdx || idx < 0 || idx >= cardData.length) return;
+    animating = true;
+
+    // Dissolve current card
+    createParticles(true);
+    cardData[currentIdx].classList.add('dissolving');
+
+    setTimeout(function() {
+      animateDissolve(function() {
+        cardData[currentIdx].className = 'gcard';
+        currentIdx = idx;
+
+        // Materialize new card
+        createParticles(false);
+        animateMaterialize(function() {
+          showCard(currentIdx);
+          animating = false;
+        });
+
+        // Show card halfway through materialize for overlap
+        setTimeout(function() { showCard(currentIdx); }, 200);
+      });
+    }, 100);
+  }
+
+  window.nextCard = function() { transitionTo((currentIdx + 1) % cardData.length); };
+  window.prevCard = function() { transitionTo((currentIdx - 1 + cardData.length) % cardData.length); };
+
+  // Click dots to navigate
+  document.querySelectorAll('.gdot').forEach(function(d, i) {
+    d.addEventListener('click', function() { transitionTo(i); });
+  });
+})();
+
 // ── MOBILE CARD DOTS ──
 (function() {
   var tray = document.querySelector('.tray');
