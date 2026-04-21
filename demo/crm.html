@@ -87,10 +87,6 @@ body { background: var(--navy-deep); color: var(--text); font-family: 'Inter', s
 .rex-input::placeholder { color: var(--muted); }
 .rex-send { padding: 0.5rem 0.75rem; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy-deep); border: none; border-radius: 8px; font-size: 0.7rem; font-weight: 700; cursor: pointer; }
 
-/* VOICE FAB */
-.voice-fab { position: fixed; bottom: 1.5rem; right: 1.5rem; width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--gold); background: var(--gold-dim); color: var(--gold); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 50; transition: all 0.3s; box-shadow: 0 4px 20px rgba(201,165,92,0.2); }
-.voice-fab:hover { background: var(--gold); color: var(--navy-deep); }
-.voice-fab.active { border-color: var(--red); color: var(--red); background: rgba(248,113,113,0.1); animation: pulse 1.5s infinite; }
 
 /* DEMO BANNER */
 .demo-banner { background: linear-gradient(135deg, rgba(201,165,92,0.08), rgba(201,165,92,0.03)); border: 1px solid rgba(201,165,92,0.15); border-radius: var(--radius); padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; }
@@ -166,6 +162,9 @@ body { background: var(--navy-deep); color: var(--text); font-family: 'Inter', s
         <div class="rex-msg assistant" id="rexWelcome">Loading...</div>
       </div>
       <div class="rex-input-row">
+        <button id="voiceBtn" onclick="toggleVoice()" title="Talk to Rex" style="width:38px;height:38px;border-radius:50%;border:2px solid var(--gold);background:var(--gold-dim);color:var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.3s;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+        </button>
         <input class="rex-input" id="rexInput" placeholder="Ask Rex anything..." onkeydown="if(event.key==='Enter')sendRex()">
         <button class="rex-send" onclick="sendRex()">Send</button>
       </div>
@@ -173,10 +172,6 @@ body { background: var(--navy-deep); color: var(--text); font-family: 'Inter', s
   </div>
 </div>
 
-<!-- VOICE FAB -->
-<button class="voice-fab" id="voiceBtn" onclick="toggleVoice()" title="Talk to Rex">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-</button>
 
 <script>
 var SB = 'https://jtifhcvbgxqwlywugvjv.supabase.co';
@@ -226,8 +221,8 @@ if (isFullMode) {
 
 // Rex welcome message
 var welcomeMsg = isFullMode
-  ? 'Welcome to the CORTEX demo, ' + lead.name + '! Your phone should be ringing shortly with a live AI demonstration.\n\nWhile you wait, I\'m Rex — the CORTEX voice assistant. You can ask me anything about the platform, or after your call, try saying:\n\n"Rex, send ' + lead.name + ' a follow-up email about CORTEX for ' + (lead.use_case || 'their business') + '"\n\nI\'ll generate a personalized email and deliver it to ' + lead.email + ' in real time.'
-  : 'Welcome to the CORTEX demo, ' + lead.name + '! I\'m Rex — the CORTEX voice assistant.\n\nYou can ask me about the platform, your client record, or try the email feature:\n\n"Rex, send ' + lead.name + ' an email about how CORTEX works for ' + (lead.use_case || 'their business') + '"\n\nI\'ll generate a personalized HTML email and deliver it to ' + lead.email + '.';
+  ? 'Welcome to the CORTEX demo, ' + lead.name + '! Your phone should be ringing shortly with a live AI demonstration.\n\nWhile you wait, try typing:\n\n"send me a follow-up email"\n\nI\'ll generate a personalized business intelligence brief and deliver it to ' + lead.email + '.\n\nAfter that, hit the microphone button next to this input and talk to me directly. Ask me anything about what we can build for ' + (lead.company || 'your business') + '.'
+  : 'Welcome to the CORTEX demo, ' + lead.name + '!\n\nTry typing:\n\n"send me a follow-up email"\n\nI\'ll generate a personalized business intelligence brief and deliver it to ' + lead.email + '.\n\nThen hit the microphone button and talk to me directly. Ask me how we would solve the challenges you described for ' + (lead.company || 'your business') + '.';
 document.getElementById('rexWelcome').textContent = welcomeMsg;
 
 // Rex text chat
@@ -295,7 +290,7 @@ async function toggleVoice() {
   if (voiceActive) { stopVoice(); return; }
   var btn = document.getElementById('voiceBtn');
   var statusMsg = document.getElementById('rexMessages');
-  btn.classList.add('active');
+  btn.style.borderColor = 'var(--red)'; btn.style.color = 'var(--red)'; btn.style.background = 'rgba(248,113,113,0.1)';
   try {
     var connMsg = document.createElement('div');
     connMsg.className = 'rex-msg assistant';
@@ -371,7 +366,7 @@ async function toggleVoice() {
 
 function stopVoice() {
   voiceActive = false;
-  document.getElementById('voiceBtn').classList.remove('active');
+  var vb = document.getElementById('voiceBtn'); vb.style.borderColor = 'var(--gold)'; vb.style.color = 'var(--gold)'; vb.style.background = 'var(--gold-dim)';
   if (voiceProc) voiceProc.disconnect();
   if (voiceMic) voiceMic.getTracks().forEach(function(t) { t.stop(); });
   if (voiceCtx) voiceCtx.close();
