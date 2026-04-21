@@ -297,8 +297,15 @@ video {
 </head>
 <body>
 
+<!-- LOADER -->
+<div id="vidLoader" style="position:fixed;inset:0;z-index:50;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;transition:opacity 0.6s;">
+  <div style="width:32px;height:32px;border:2px solid rgba(255,255,255,0.1);border-top-color:rgba(255,255,255,0.6);border-radius:50%;animation:loaderSpin 0.8s linear infinite;"></div>
+  <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);letter-spacing:0.2em;text-transform:uppercase;font-family:Inter,sans-serif;">Loading</div>
+</div>
+<style>@keyframes loaderSpin { to { transform: rotate(360deg); } }</style>
+
 <!-- VIDEO -->
-<video id="vid" autoplay muted playsinline></video>
+<video id="vid" autoplay muted playsinline loop></video>
 
 <!-- NAV -->
 <nav class="grid-nav">
@@ -591,66 +598,38 @@ video {
   });
 })();
 
-// ── HLS VIDEO WITH SMOOTH LOOP ──
+// ── HLS VIDEO ──
 const video = document.getElementById('vid');
 const src = 'https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8';
+const loader = document.getElementById('vidLoader');
 
 video.muted = true;
 video.playsInline = true;
 
-let videoPlaying = false;
-
-function tryPlay() {
-  if (videoPlaying) return;
-  video.muted = true;
-  const p = video.play();
-  if (p) p.then(() => { videoPlaying = true; }).catch(() => {});
+function hideLoader() {
+  if (loader) { loader.style.opacity = '0'; setTimeout(() => { loader.style.display = 'none'; }, 600); }
 }
 
-// Retry every second until video is confirmed playing
-const playCheck = setInterval(() => {
-  if (video.currentTime > 0 && !video.paused) {
-    videoPlaying = true;
-    clearInterval(playCheck);
-  } else {
-    tryPlay();
-  }
-}, 1000);
-
-// Also try on any user interaction
-['click', 'touchstart', 'scroll', 'keydown'].forEach(evt => {
-  document.addEventListener(evt, () => { if (!videoPlaying) tryPlay(); }, { once: true });
-});
-
 if (Hls.isSupported()) {
-  const hls = new Hls({ enableWorker: false, startLevel: 0 });
+  const hls = new Hls();
   hls.loadSource(src);
   hls.attachMedia(video);
-  hls.on(Hls.Events.MANIFEST_PARSED, () => tryPlay());
-  hls.on(Hls.Events.ERROR, (e, data) => {
-    if (data.fatal) {
-      if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-        hls.recoverMediaError();
-      } else {
-        hls.destroy();
-        const hls2 = new Hls({ enableWorker: false, startLevel: 0 });
-        hls2.loadSource(src);
-        hls2.attachMedia(video);
-        hls2.on(Hls.Events.MANIFEST_PARSED, () => tryPlay());
-      }
-    }
+  hls.on(Hls.Events.MANIFEST_PARSED, () => {
+    video.play().then(hideLoader).catch(() => {
+      ['click','touchstart'].forEach(e => document.addEventListener(e, () => { video.play().then(hideLoader).catch(()=>{}); }, { once: true }));
+    });
   });
-
-  video.addEventListener('timeupdate', () => {
-    if (video.duration && video.currentTime > video.duration - 0.3) {
-      video.currentTime = 0.05;
-      video.play().catch(() => {});
-    }
+  hls.on(Hls.Events.ERROR, (e, data) => {
+    if (data.fatal && data.type === Hls.ErrorTypes.MEDIA_ERROR) hls.recoverMediaError();
   });
 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
   video.src = src;
-  video.setAttribute('loop', '');
-  video.addEventListener('loadedmetadata', () => tryPlay());
+  video.loop = true;
+  video.addEventListener('loadedmetadata', () => {
+    video.play().then(hideLoader).catch(() => {
+      ['click','touchstart'].forEach(e => document.addEventListener(e, () => { video.play().then(hideLoader).catch(()=>{}); }, { once: true }));
+    });
+  });
 }
 
 // ── AMBIENT PARTICLES ──
