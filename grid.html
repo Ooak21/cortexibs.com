@@ -647,10 +647,11 @@ if (typeof Hls !== 'undefined' && !window.__cortexHlsFailed && Hls.isSupported()
   hideLoader();
 }
 
-// Keep retrying play until it works
-const playRetry = setInterval(() => {
-  if (video.currentTime > 0 && !video.paused) { clearInterval(playRetry); hideLoader(); }
-  else { video.muted = true; video.play().catch(() => {}); }
+// Keep retrying play forever — if the video ever pauses, stalls, or ends without looping, resume it.
+// Don't clear the interval on first success (previous behavior left the page stuck on any later stall).
+setInterval(() => {
+  if (video.paused || video.ended) { video.muted = true; video.play().catch(() => {}); }
+  else if (video.currentTime > 0) hideLoader();
 }, 1500);
 
 // ── AMBIENT PARTICLES ──
