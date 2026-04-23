@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CORTEX — Enter the Grid</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+<!-- hls.js PINNED to 1.5.20. Do not change without testing desktop autoplay on Chrome + Safari.
+     Unpinned (hls.js@1) was auto-pulling 1.6.x which silently broke desktop autoplay repeatedly. -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.20" onerror="window.__cortexHlsFailed=true;"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -622,7 +624,9 @@ function tryPlay() {
   video.play().then(hideLoader).catch(() => {});
 }
 
-if (Hls.isSupported()) {
+// Guard: typeof check prevents ReferenceError if hls.js CDN failed to load.
+// Order of preference: hls.js (Chrome/Firefox/Edge) → native HLS (Safari) → graceful noop.
+if (typeof Hls !== 'undefined' && !window.__cortexHlsFailed && Hls.isSupported()) {
   const hls = new Hls({ enableWorker: false });
   hls.loadSource(src);
   hls.attachMedia(video);
@@ -634,9 +638,13 @@ if (Hls.isSupported()) {
     }
   });
 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+  // Safari native HLS path
   video.src = src;
   video.loop = true;
   video.addEventListener('loadedmetadata', tryPlay);
+} else {
+  // hls.js missing + no native HLS → video won't play; hide loader so cards show
+  hideLoader();
 }
 
 // Keep retrying play until it works
