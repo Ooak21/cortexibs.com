@@ -146,16 +146,6 @@ body::after {
   animation: fadeUp 1s 0.2s ease forwards;
 }
 
-.hero-tag::before, .hero-tag::after {
-  content: "";
-  display: inline-block;
-  width: 36px;
-  height: 1px;
-  background: var(--fg-mute);
-  vertical-align: middle;
-  margin: 0 1rem;
-}
-
 .hero-headline {
   font-size: clamp(2.6rem, 6.4vw, 5rem);
   font-weight: 200;
@@ -288,16 +278,6 @@ body::after {
   text-transform: uppercase;
   color: var(--fg-low);
   margin-bottom: 2.2rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.section-num::before {
-  content: "";
-  width: 36px;
-  height: 1px;
-  background: var(--fg-mute);
 }
 
 .section-heading {
@@ -550,14 +530,7 @@ body::after {
   padding: 6rem 2rem 6rem;
 }
 
-.closing .section-num { justify-content: center; }
-.closing .section-num::before,
-.closing .section-num::after {
-  content: "";
-  width: 36px; height: 1px;
-  background: var(--fg-mute);
-}
-.closing .section-num::before { background: var(--fg-mute); }
+.closing .section-num { text-align: center; }
 
 .closing-line {
   font-size: clamp(2.2rem, 5vw, 3.6rem);
