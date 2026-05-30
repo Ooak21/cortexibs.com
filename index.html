@@ -1,852 +1,1732 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CORTEX · Operations Without Operators</title>
-<meta name="description" content="IBS builds the autonomous infrastructure that runs lending, advisory, and supply chain operations end to end.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg-0: #04040a;
-  --bg-1: #08081a;
-  --fg: rgba(255, 255, 255, 0.94);
-  --fg-mid: rgba(255, 255, 255, 0.62);
-  --fg-low: rgba(255, 255, 255, 0.38);
-  --fg-mute: rgba(255, 255, 255, 0.22);
-  --line: rgba(255, 255, 255, 0.08);
-  --line-bright: rgba(255, 255, 255, 0.22);
-  --glow-soft: 0 0 12px rgba(255, 255, 255, 0.18);
-  --glow-mid: 0 0 18px rgba(255, 255, 255, 0.28), 0 0 38px rgba(255, 255, 255, 0.10);
-  --glow-strong: 0 0 22px rgba(255, 255, 255, 0.45), 0 0 60px rgba(255, 255, 255, 0.18);
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html {
-  scroll-behavior: smooth;
-  background: var(--bg-0);
-}
-
-body {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-weight: 300;
-  color: var(--fg);
-  background:
-    radial-gradient(ellipse at 20% -10%, rgba(40, 30, 80, 0.18) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 110%, rgba(20, 40, 80, 0.14) 0%, transparent 55%),
-    var(--bg-0);
-  min-height: 100vh;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-/* ── HERO VIDEO ── */
-.hero video.hero-bg {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  z-index: 0;
-}
-
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(4,4,10,0.35) 0%, rgba(4,4,10,0.55) 55%, rgba(4,4,10,0.92) 100%);
-  z-index: 1;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-/* ── NAV ── */
-.nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 30;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.6rem 2.5rem;
-  background: linear-gradient(180deg, rgba(4,4,10,0.7) 0%, rgba(4,4,10,0.0) 100%);
-  pointer-events: none;
-}
-
-.nav > * { pointer-events: auto; }
-
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  text-decoration: none;
-  color: var(--fg);
-}
-
-.nav-logo {
-  width: 1.6rem;
-  height: 1.6rem;
-  border-radius: 3px;
-  filter: drop-shadow(0 0 8px rgba(255,255,255,0.18));
-}
-
-.nav-text {
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1;
-}
-
-.nav-text span {
-  font-weight: 700;
-  text-shadow: var(--glow-mid);
-  animation: xPulse 3.6s ease-in-out infinite;
-}
-
-@keyframes xPulse {
-  0%, 100% { text-shadow: 0 0 10px rgba(255,255,255,0.25), 0 0 22px rgba(255,255,255,0.10); }
-  50% { text-shadow: 0 0 18px rgba(255,255,255,0.55), 0 0 38px rgba(255,255,255,0.20); }
-}
-
-.nav-coords {
-  font-family: 'JetBrains Mono', 'Courier New', monospace;
-  font-size: 0.6rem;
-  letter-spacing: 0.18em;
-  color: var(--fg-low);
-  text-align: right;
-  line-height: 1.5;
-}
-
-/* ── HERO ── */
-.hero {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 7rem 2rem 4rem;
-  text-align: center;
-  overflow: hidden;
-}
-
-.hero-tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.42em;
-  text-transform: uppercase;
-  color: var(--fg-low);
-  margin-bottom: 2.2rem;
-  opacity: 0;
-  animation: fadeUp 1s 0.2s ease forwards;
-}
-
-.hero-headline {
-  font-size: clamp(2.6rem, 6.4vw, 5rem);
-  font-weight: 200;
-  letter-spacing: -0.025em;
-  line-height: 1.0;
-  max-width: 18ch;
-  margin: 0 auto 2rem;
-  text-shadow: 0 0 40px rgba(255,255,255,0.08);
-  opacity: 0;
-  animation: fadeUp 1.2s 0.45s ease forwards;
-}
-
-.hero-headline em {
-  font-style: normal;
-  font-weight: 300;
-  background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.7) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.hero-sub {
-  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
-  font-weight: 300;
-  line-height: 1.7;
-  color: var(--fg-mid);
-  max-width: 38rem;
-  margin: 0 auto 2.6rem;
-  opacity: 0;
-  animation: fadeUp 1.2s 0.7s ease forwards;
-}
-
-.hero-cta-row {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.6rem;
-  opacity: 0;
-  animation: fadeUp 1.2s 0.95s ease forwards;
-}
-
-.hero-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.95rem 1.8rem;
-  border: 1px solid var(--line-bright);
-  border-radius: 999px;
-  background: rgba(255,255,255,0.02);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  color: var(--fg);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.78rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: border-color 0.4s, background 0.4s, box-shadow 0.4s, transform 0.4s;
-}
-
-.hero-cta:hover {
-  border-color: rgba(255,255,255,0.55);
-  background: rgba(255,255,255,0.06);
-  box-shadow: 0 0 28px rgba(255,255,255,0.18);
-  transform: translateY(-1px);
-}
-
-.hero-cta .arrow { font-weight: 300; transition: transform 0.4s; }
-.hero-cta:hover .arrow { transform: translateX(4px); }
-
-.hero-tagline {
-  font-size: 0.82rem;
-  font-weight: 300;
-  line-height: 1.6;
-  color: var(--fg-low);
-  max-width: 32rem;
-  font-style: italic;
-}
-
-.hero-scroll {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.55rem;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--fg-mute);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
-  opacity: 0;
-  animation: fadeUp 1s 1.4s ease forwards;
-}
-
-.hero-scroll .line {
-  width: 1px;
-  height: 36px;
-  background: linear-gradient(180deg, var(--fg-mute), transparent);
-  animation: drop 2.4s ease-in-out infinite;
-}
-
-@keyframes drop {
-  0% { transform: scaleY(0); transform-origin: top; }
-  50% { transform: scaleY(1); transform-origin: top; }
-  51% { transform: scaleY(1); transform-origin: bottom; }
-  100% { transform: scaleY(0); transform-origin: bottom; }
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ── SECTIONS ── */
-.section {
-  position: relative;
-  max-width: 56rem;
-  margin: 0 auto;
-  padding: 7rem 2rem;
-}
-
-.section-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--fg-low);
-  margin-bottom: 2.2rem;
-}
-
-.section-heading {
-  font-size: clamp(1.7rem, 3.2vw, 2.4rem);
-  font-weight: 300;
-  letter-spacing: -0.018em;
-  line-height: 1.18;
-  color: var(--fg);
-  margin-bottom: 2rem;
-  max-width: 28ch;
-  text-shadow: 0 0 30px rgba(255,255,255,0.06);
-}
-
-.section-lede {
-  font-size: 1rem;
-  font-weight: 300;
-  line-height: 1.7;
-  color: var(--fg-mid);
-  margin-bottom: 2.4rem;
-  max-width: 38rem;
-}
-
-.section-body {
-  font-size: 0.96rem;
-  font-weight: 300;
-  line-height: 1.8;
-  color: var(--fg-mid);
-  margin-bottom: 1.4rem;
-  max-width: 38rem;
-}
-
-.section-body em {
-  font-style: normal;
-  color: var(--fg);
-  font-weight: 400;
-}
-
-.section-coda {
-  margin-top: 3rem;
-  font-size: 0.95rem;
-  font-weight: 400;
-  line-height: 1.6;
-  color: var(--fg);
-  font-style: italic;
-  letter-spacing: -0.005em;
-  border-top: 1px solid var(--line);
-  padding-top: 2rem;
-  max-width: 38rem;
-}
-
-/* ── ARCHITECTURE BLOCKS (02) ── */
-.arch-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 2.4rem;
-  margin-top: 1rem;
-}
-
-.arch-block {
-  display: grid;
-  grid-template-columns: 7rem 1fr;
-  gap: 2rem;
-  padding: 1.8rem 0;
-  border-top: 1px solid var(--line);
-  align-items: start;
-}
-
-.arch-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--fg);
-  text-shadow: var(--glow-soft);
-  padding-top: 0.3rem;
-  position: relative;
-}
-
-.arch-label::after {
-  content: "";
-  position: absolute;
-  left: 0; top: -1.81rem;
-  width: 36px;
-  height: 1px;
-  background: rgba(255,255,255,0.6);
-  box-shadow: 0 0 8px rgba(255,255,255,0.3);
-}
-
-.arch-text {
-  font-size: 0.95rem;
-  font-weight: 300;
-  line-height: 1.8;
-  color: var(--fg-mid);
-}
-
-.arch-text strong {
-  color: var(--fg);
-  font-weight: 400;
-}
-
-/* ── PRODUCT CARDS (03) ── */
-.product-list,
-.deployment-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  margin-top: 1rem;
-}
-
-.product-card,
-.deployment-card {
-  position: relative;
-  padding: 2rem 2rem 2rem 2.4rem;
-  background: rgba(255,255,255,0.018);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  transition: border-color 0.5s, background 0.5s, transform 0.5s;
-  overflow: hidden;
-}
-
-.product-card::before,
-.deployment-card::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 0;
-  width: 1px; height: 100%;
-  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.5), transparent);
-  opacity: 0.4;
-  transition: opacity 0.5s;
-}
-
-.product-card:hover,
-.deployment-card:hover {
-  border-color: var(--line-bright);
-  background: rgba(255,255,255,0.03);
-  transform: translateY(-2px);
-}
-
-.product-card:hover::before,
-.deployment-card:hover::before {
-  opacity: 1;
-}
-
-.product-name {
-  font-size: 1.05rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--fg);
-  margin-bottom: 0.9rem;
-  text-shadow: var(--glow-soft);
-}
-
-.product-card p,
-.deployment-card p {
-  font-size: 0.92rem;
-  font-weight: 300;
-  line-height: 1.75;
-  color: var(--fg-mid);
-}
-
-/* ── DEPLOYMENT CARDS (04) ── */
-.deployment-card {
-  padding: 1.6rem 1.8rem 1.6rem 2rem;
-}
-
-.deployment-row {
-  display: flex;
-  align-items: baseline;
-  gap: 1rem;
-  margin-bottom: 0.7rem;
-  flex-wrap: wrap;
-}
-
-.deployment-title {
-  font-size: 0.92rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--fg);
-  text-shadow: var(--glow-soft);
-}
-
-.deployment-meta {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--fg-low);
-}
-
-.deployment-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.deployment-status::before {
-  content: "";
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.85);
-  box-shadow: 0 0 8px rgba(255,255,255,0.7);
-  animation: pulseDot 2.4s ease-in-out infinite;
-}
-
-@keyframes pulseDot {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-
-.deployment-card p {
-  font-size: 0.9rem;
-}
-
-/* ── ENGINE (05) ── */
-.engine-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 0.45rem 0.9rem;
-  margin-bottom: 1.6rem;
-  border: 1px solid var(--line-bright);
-  border-radius: 3px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--fg);
-  background: rgba(255,255,255,0.025);
-  text-shadow: var(--glow-soft);
-}
-
-.engine-badge::before {
-  content: "";
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.9);
-  box-shadow: 0 0 10px rgba(255,255,255,0.7);
-  animation: pulseDot 2s ease-in-out infinite;
-}
-
-/* ── CLOSING (06) ── */
-.closing {
-  min-height: 70vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 6rem 2rem 6rem;
-}
-
-.closing .section-num { text-align: center; }
-
-.closing-line {
-  font-size: clamp(2.2rem, 5vw, 3.6rem);
-  font-weight: 200;
-  letter-spacing: -0.025em;
-  line-height: 1.1;
-  margin-bottom: 3rem;
-  text-shadow: 0 0 40px rgba(255,255,255,0.12);
-}
-
-.closing-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 1.05rem 2.2rem;
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: 999px;
-  background: rgba(255,255,255,0.04);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: var(--fg);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: all 0.4s;
-  box-shadow: 0 0 24px rgba(255,255,255,0.06);
-}
-
-.closing-cta:hover {
-  border-color: #fff;
-  background: rgba(255,255,255,0.1);
-  box-shadow: 0 0 36px rgba(255,255,255,0.3);
-  transform: translateY(-2px);
-}
-
-.closing-cta .arrow { transition: transform 0.4s; }
-.closing-cta:hover .arrow { transform: translateX(5px); }
-
-/* ── FOOTER ── */
-.foot {
-  text-align: center;
-  padding: 2rem 2rem 3rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.55rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--fg-mute);
-  border-top: 1px solid var(--line);
-  max-width: 56rem;
-  margin: 0 auto;
-}
-
-/* ── REVEAL ── */
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 1.1s ease, transform 1.1s ease;
-}
-.reveal.in {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ── RESPONSIVE ── */
-@media (max-width: 720px) {
-  .nav { padding: 1.2rem 1.4rem; }
-  .nav-coords { display: none; }
-  .section { padding: 5rem 1.5rem; }
-  .arch-block {
-    grid-template-columns: 1fr;
-    gap: 0.9rem;
-  }
-  .arch-label::after { top: -1.81rem; }
-  .product-card, .deployment-card { padding: 1.6rem 1.4rem 1.6rem 1.8rem; }
-  .hero { padding: 6rem 1.5rem 4rem; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DXR Discover | Fresh County Leads, Instant Intelligence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+
+    /* Added: Animated hero video background from cortexibs.com */
+    .hero-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(4,4,10,0.35) 0%, rgba(4,4,10,0.55) 55%, rgba(4,4,10,0.92) 100%);
+      z-index: 1;
+    }
+
+    :root {
+      --bg: #0b0c10;
+      --surface: #121317;
+      --surface-2: #1a1b22;
+      --border: #2c2e38;
+      --text: #f8f9fc;
+      --muted: #8a8f9e;
+      --accent: #3b82f6;
+      --accent-2: #60a5fa;
+      --gold: #f59e0b;
+      --emerald: #10b981;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    .font-display {
+      font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+      font-feature-settings: "ss01";
+    }
+
+    .premium-gradient {
+      background: linear-gradient(145deg, #0b0c10 0%, #121317 100%);
+    }
+
+    .section {
+      scroll-margin-top: 80px;
+    }
+
+    .lead-card {
+      transition: all 0.2s cubic-bezier(0.23, 1.0, 0.32, 1);
+    }
+    .lead-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    .metric {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .nav-scrolled {
+      background: rgba(11, 12, 16, 0.96);
+      backdrop-filter: blur(20px);
+    }
+
+    .hero-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .data-pill {
+      font-size: 0.75rem;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      font-weight: 600;
+      letter-spacing: 0.025em;
+    }
+
+    .modern-shadow {
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+                  0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    /* FAQ premium dark accordion */
+    .faq-item {
+      transition: all 0.2s cubic-bezier(0.23, 1.0, 0.32, 1);
+    }
+    .faq-item:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.15);
+    }
+    .faq-item.open {
+      border-color: rgba(59, 130, 246, 0.35);
+      background: #1a1b22;
+    }
+    .faq-chevron {
+      transition: transform 0.35s cubic-bezier(0.23, 1.0, 0.32, 1);
+    }
+    .faq-item.open .faq-chevron {
+      transform: rotate(180deg);
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.45s cubic-bezier(0.23, 1.0, 0.32, 1);
+    }
+    .faq-item.open .faq-answer {
+      max-height: 280px;
+    }
+    .faq-answer-inner {
+      padding-top: 0.25rem;
+      padding-bottom: 1.5rem;
+      border-top: 1px solid #2c2e38;
+      margin-top: 0.25rem;
+    }
+
+    /* System section: very slow cinematic fade when scrolling in.
+       Text goes from light to black smoothly. Overlay lightens gradually. */
+    #the-system .absolute {
+      transition: background 6500ms cubic-bezier(0.23, 1.0, 0.32, 1);
+    }
+
+    #the-system.system-white .text-xs,
+    #the-system.system-white .text-5xl,
+    #the-system.system-white p {
+      color: #111111 !important;
+      transition: color 5200ms 800ms cubic-bezier(0.23, 1.0, 0.32, 1);
+    }
+
+    /* Lighter overlay fades in for black text visibility while keeping the skyscraper image dominant */
+    #the-system.system-white > .absolute {
+      background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 35%, rgba(0,0,0,0.22) 100%) !important;
+    }
+  </style>
 </head>
-<body>
+<body class="bg-[#0b0c10] text-[#f8f9fc]">
 
-<!-- NAV -->
-<nav class="nav">
-  <a href="./" class="nav-brand">
-    <img src="./assets/logos/ibs_mark_only.svg" alt="IBS" class="nav-logo">
-    <div class="nav-text">corte<span>X</span></div>
-  </a>
-  <div class="nav-coords">
-    36.1716° N<br>
-    115.1391° W
+  <!-- Navigation -->
+  <nav id="nav" class="fixed top-0 left-0 right-0 z-50 border-b border-[#2c2e38] bg-[#0b0c10]/95 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-[1px]">
+          <img src="./assets/dxr-discover-logo.png" alt="CORTEX Discover" class="h-9 w-auto">
+          <div>
+            <span class="font-semibold text-2xl tracking-[-1.5px]">CORTEX</span>
+            <span class="font-medium text-xl text-[#a1a1aa]">Discover</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-10 text-sm font-medium">
+        <a href="#how" class="hover:text-white transition-colors text-[#a1a1aa]">How it works</a>
+        <a href="#examples" class="hover:text-white transition-colors text-[#a1a1aa]">Live examples</a>
+        <a href="#features" class="hover:text-white transition-colors text-[#a1a1aa]">Features</a>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="showLoginModal()"
+                class="px-5 py-2.5 text-sm font-medium rounded-2xl border border-[#2c2e38] hover:bg-[#1a1b22] transition-colors">
+          Log in
+        </button>
+        <button onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})"
+                class="px-6 py-2.5 text-sm font-semibold rounded-2xl bg-white text-[#0b0c10] hover:bg-[#f4f4f5] transition-all active:scale-[0.985]">
+          Request access
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="pt-20 pb-16 relative overflow-hidden">
+    <div class="max-w-5xl mx-auto px-8 pt-12 text-center relative z-10">
+      <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[#1a1b22] text-xs font-medium tracking-[1.5px] mb-6">
+        <div class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
+        NOW LIVE IN CLARK COUNTY
+      </div>
+
+      <h1 class="text-7xl md:text-7xl font-semibold tracking-[-4.2px] leading-[0.92] mb-6">
+        Fresh distress.<br>
+        <span class="text-[#a1a1aa]">Zero guesswork.</span>
+      </h1>
+
+      <p class="max-w-md mx-auto text-xl text-[#a1a1aa] tracking-tight">
+        The only platform that turns raw county recorder filings into immediately actionable, enriched intelligence.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
+        <button onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})"
+                class="px-8 py-4 rounded-3xl bg-white text-[#0b0c10] font-semibold text-lg hover:bg-[#f4f4f5] transition-all active:scale-[0.985] shadow-2xl shadow-black/30">
+          Get early access
+        </button>
+        <button onclick="document.getElementById('examples').scrollIntoView({behavior:'smooth'})"
+                class="px-8 py-4 rounded-3xl border border-[#2c2e38] hover:bg-[#1a1b22] text-lg font-medium transition-all">
+          See real examples
+        </button>
+      </div>
+
+      <div class="mt-8 text-xs text-[#a1a1aa] tracking-widest">
+        USED BY WHOLESALERS • HARD MONEY LENDERS • DISPOSITION TEAMS
+      </div>
+
+      <div class="mt-4">
+        <a href="/terminal.html" 
+           style="font-size: 12px; color: #3b82f6; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          <i class="fas fa-terminal"></i> 
+          <span>Watch in terminal</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Animated hero video background (only change) -->
+    <video class="hero-bg" autoplay loop muted playsinline src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260407_043131_ebe2f0b5-9acc-4a4f-b2c1-7297f1a3beb9.mp4"></video>
+    <div class="hero-overlay"></div>
   </div>
-</nav>
 
-<!-- HERO -->
-<section class="hero">
-  <video class="hero-bg" autoplay loop muted playsinline src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260407_043131_ebe2f0b5-9acc-4a4f-b2c1-7297f1a3beb9.mp4"></video>
-  <div class="hero-overlay"></div>
-  <div class="hero-content">
-    <div class="hero-tag">Innovative Blockchain Solutions</div>
-    <h1 class="hero-headline">Operations<br>without <em>operators</em>.</h1>
-    <p class="hero-sub">
-      Our agents have wallets. They make calls. They settle on chain. They run lending, advisory, and supply chain workflows end to end, and they don't sleep.
-    </p>
-    <div class="hero-cta-row">
-      <a href="#engine" class="hero-cta">
-        Meet the engine <span class="arrow">→</span>
+  <!-- Trust bar -->
+  <div class="border-y border-[#2c2e38] py-5">
+    <div class="max-w-6xl mx-auto px-8 flex flex-wrap items-center justify-center gap-x-12 gap-y-4 text-sm text-[#e2e2eb]">
+      <div>Clark County Recorder</div>
+      <div>Real-time data</div>
+      <div>ATTOM + Public GIS</div>
+      <div>Synthetic Pre-NOD scoring</div>
+      <div>Neighborhood intelligence</div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div id="how" class="max-w-6xl mx-auto px-8 pt-20 pb-12">
+    <div class="text-center mb-12">
+      <div class="text-xs font-semibold tracking-[3px] text-[#a1a1aa]">THREE STEPS. ZERO MANUAL WORK.</div>
+      <div class="text-5xl font-semibold tracking-tighter mt-3">From filing to actionable in minutes.</div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="glass p-8 rounded-3xl border border-[#2c2e38]">
+        <div class="text-6xl font-light text-[#a1a1aa] mb-8">01</div>
+        <div class="text-2xl font-semibold tracking-tight mb-3">Scan the county</div>
+        <p class="text-[#a1a1aa]">We pull fresh NODs, lis pendens, breach &amp; election to sell, and trustee sales directly from the recorder every day.</p>
+      </div>
+      <div class="glass p-8 rounded-3xl border border-[#2c2e38]">
+        <div class="text-6xl font-light text-[#a1a1aa] mb-8">02</div>
+        <div class="text-2xl font-semibold tracking-tight mb-3">Enrich automatically</div>
+        <p class="text-[#a1a1aa]">Every lead gets GIS fallback + federal layers + synthetic Pre-NOD. Full ATTOM when it matters most.</p>
+      </div>
+      <div class="glass p-8 rounded-3xl border border-[#2c2e38]">
+        <div class="text-6xl font-light text-[#a1a1aa] mb-8">03</div>
+        <div class="text-2xl font-semibold tracking-tight mb-3">Act with confidence</div>
+        <p class="text-[#a1a1aa]">See owner status, equity signals, neighborhood demographics, and skip-trace paths in one clean view.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Examples with Mock Data -->
+  <div id="examples" class="bg-[#121317] py-16 border-y border-[#2c2e38]">
+    <div class="max-w-6xl mx-auto px-8">
+      <div class="flex justify-between items-end mb-8">
+        <div>
+          <div class="text-xs font-semibold tracking-[3px] text-[#a1a1aa]">REAL CLARK COUNTY FILINGS • JAN 2026</div>
+          <div class="text-4xl font-semibold tracking-tighter">What your competitors are looking at right now.</div>
+        </div>
+        <div class="text-sm text-[#a1a1aa]">Mock data shown for demonstration</div>
+      </div>
+
+      <!-- Example Leads -->
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Lead 1 -->
+        <div class="bg-[#1a1b22] border border-[#2c2e38] rounded-3xl p-6 hover:border-[#3b82f6] transition-colors">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <div class="font-mono text-xs text-[#a1a1aa]">2026-01-14 • BREACH &amp; ELECTION</div>
+              <div class="font-semibold text-xl tracking-tight mt-1">179-21-611-027</div>
+            </div>
+            <div class="data-pill bg-rose-500/10 text-rose-400 border border-rose-500/30">Pre-NOD 78</div>
+          </div>
+          
+          <div class="text-sm mb-4">
+            <span class="text-[#a1a1aa]">Grantor:</span> <span class="font-medium">Johnson Family Living Trust</span><br>
+            <span class="text-[#a1a1aa]">Address:</span> 1002 Blue Lantern Dr, Henderson
+          </div>
+
+          <div class="pt-4 border-t border-[#2c2e38] text-xs grid grid-cols-3 gap-4">
+            <div><span class="text-[#a1a1aa]">Equity</span><br><span class="font-semibold text-emerald-400">$187k (62%)</span></div>
+            <div><span class="text-[#a1a1aa]">Owner</span><br><span class="font-medium">Absentee</span></div>
+            <div><span class="text-[#a1a1aa]">Flood</span><br><span class="font-medium">Zone X</span></div>
+          </div>
+        </div>
+
+        <!-- Lead 2 -->
+        <div class="bg-[#1a1b22] border border-[#2c2e38] rounded-3xl p-6 hover:border-[#3b82f6] transition-colors">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <div class="font-mono text-xs text-[#a1a1aa]">2026-01-12 • LIS PENDENS</div>
+              <div class="font-semibold text-xl tracking-tight mt-1">142-08-412-055</div>
+            </div>
+            <div class="data-pill bg-amber-500/10 text-amber-400 border border-amber-500/30">Pre-NOD 51</div>
+          </div>
+          
+          <div class="text-sm mb-4">
+            <span class="text-[#a1a1aa]">Grantor:</span> <span class="font-medium">Maria Elena Soto</span><br>
+            <span class="text-[#a1a1aa]">Address:</span> 2847 E Flamingo Rd, Las Vegas
+          </div>
+
+          <div class="pt-4 border-t border-[#2c2e38] text-xs grid grid-cols-3 gap-4">
+            <div><span class="text-[#a1a1aa]">Equity</span><br><span class="font-semibold text-emerald-400">$94k (41%)</span></div>
+            <div><span class="text-[#a1a1aa]">Owner</span><br><span class="font-medium">Owner-Occupied</span></div>
+            <div><span class="text-[#a1a1aa]">Schools</span><br><span class="font-medium">2.1 mi avg</span></div>
+          </div>
+        </div>
+
+        <!-- Lead 3 -->
+        <div class="bg-[#1a1b22] border border-[#2c2e38] rounded-3xl p-6 hover:border-[#3b82f6] transition-colors">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <div class="font-mono text-xs text-[#a1a1aa]">2026-01-09 • NTS</div>
+              <div class="font-semibold text-xl tracking-tight mt-1">215-34-710-112</div>
+            </div>
+            <div class="data-pill bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Pre-NOD 29</div>
+          </div>
+          
+          <div class="text-sm mb-4">
+            <span class="text-[#a1a1aa]">Grantor:</span> <span class="font-medium">Silver State Holdings LLC</span><br>
+            <span class="text-[#a1a1aa]">Address:</span> 4455 S Decatur Blvd, Las Vegas
+          </div>
+
+          <div class="pt-4 border-t border-[#2c2e38] text-xs grid grid-cols-3 gap-4">
+            <div><span class="text-[#a1a1aa]">Equity</span><br><span class="font-semibold text-emerald-400">$312k (71%)</span></div>
+            <div><span class="text-[#a1a1aa]">Owner</span><br><span class="font-medium">Corporate</span></div>
+            <div><span class="text-[#a1a1aa]">Neighborhood</span><br><span class="font-medium">High-value</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The Engine in Motion - Cinematic Mission Control Terminal -->
+  <div class="max-w-6xl mx-auto px-8 pt-16 pb-20">
+    <div class="text-center mb-8">
+      <div class="text-xs font-semibold tracking-[3px] text-[#a1a1aa]">THE ENGINE IN MOTION</div>
+    </div>
+
+    <div id="cortex-terminal" style="max-width: 1100px; margin: 0 auto; position: relative;">
+      <!-- Cinematic Terminal Frame -->
+      <div style="
+        background: #0a0a0f;
+        border: 1px solid #1c202a;
+        border-radius: 3px;
+        overflow: hidden;
+        box-shadow: 0 40px 110px -28px rgb(0 0 0 / 0.92), 0 0 0 1px rgba(30, 42, 58, 0.6) inset;
+        position: relative;
+      ">
+        <!-- Subtle outer filmic vignette on frame -->
+        <div style="position:absolute; inset:0; pointer-events:none; z-index:10; box-shadow: inset 0 0 80px rgba(0,0,0,0.7), inset 0 0 18px rgba(15,23,42,0.5); border-radius:3px;"></div>
+        <!-- Top Mission Control Bar -->
+        <div style="
+          background: #111114;
+          padding: 10px 18px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-bottom: 1px solid #1f222b;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 11px;
+          letter-spacing: 1.2px;
+          position: relative;
+          z-index: 12;
+        ">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="display: flex; gap: 6px;">
+              <div style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></div>
+              <div style="width: 8px; height: 8px; background: #f59e0b; border-radius: 50%;"></div>
+              <div style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%;"></div>
+            </div>
+            <span style="color: #8a8f9e; letter-spacing: 1px;">CORTEX-03 / MISSION CONTROL</span>
+          </div>
+          <div style="color: #6b7280; display: flex; align-items: center; gap: 12px;">
+            <span id="mc-status">STANDBY</span> &nbsp;•&nbsp; <span id="mc-timer">00:00:00</span>
+            <button id="video-play-pause" style="background: #1f222b; color: #a1a1aa; border: 1px solid #334455; padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; cursor: pointer;">▶ PAUSE</button>
+          </div>
+        </div>
+
+        <div style="display: flex; height: 540px; position: relative; background: #000;">
+          
+          <!-- Left Terminal Interface (Text + Command) - boot video as background -->
+          <div id="mc-left-panel" style="width: 300px; background: #0c0c10; border-right: 1px solid #1f222b; padding: 18px 16px; font-family: 'JetBrains Mono', monospace; font-size: 13px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
+            <!-- Background video in left chat pane -->
+            <video id="left-bg-video" 
+                   style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; opacity: 0; filter: brightness(1.18) contrast(1.1) saturate(1.28);"
+                   muted playsinline loop>
+              <source src="assets/videos/cortex-by-ibs.mp4" type="video/mp4">
+            </video>
+            <!-- Overlay for readability -->
+            <div style="position: absolute; inset: 0; background: rgba(12,12,16,0.48); z-index: 2;"></div>
+
+            <!-- Content on top -->
+            <div style="position: relative; z-index: 3; display: flex; flex-direction: column; height: 100%;">
+              <div style="color: #67e8f9; margin-bottom: 8px; font-size: 10px; letter-spacing: 1.5px;">CORTEX <span style="color:#f0c040">v16.4.2</span> — <span style="color:#a78bfa">INIT SEQUENCE</span></div>
+              
+              <div id="terminal-lines" style="flex: 1; color: #a1a1aa; line-height: 1.65; overflow: hidden; font-size: 12.5px;"></div>
+
+              <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #1f222b;">
+                <div style="color:#64748b; font-size:9px; letter-spacing:1.5px; margin-bottom:5px;">AWAITING LAUNCH COMMAND</div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="color: #22c55e;">$</span>
+                  <input id="deploy-input" type="text" 
+                         style="flex:1; background: transparent; border: none; color: #f8f9fc; font-family: 'JetBrains Mono', monospace; font-size: 14px; outline: none; border-bottom: 1px solid #2a3142;"
+                         placeholder="deploy cortex">
+                </div>
+                <div style="margin-top: 4px; font-size: 10px; color:#94a3b8; letter-spacing: 0.3px;">
+                  type <span style="color:#bae6fd; font-weight:500;">deploy cortex</span> + enter to open bay
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Three.js Door Viewport (Cinematic Mission Control) -->
+          <div style="flex: 1; position: relative; background: #000; overflow: hidden;">
+            <canvas id="door-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5;"></canvas>
+            
+            <!-- Video behind doors (original remote, with audio) -->
+            <video id="cortex-video" 
+                   style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; background: #000; z-index: 1; opacity: 0; transition: opacity 800ms cubic-bezier(0.22, 1, 0.36, 1);"
+                   playsinline>
+              <source src="https://luisocadiz.online/wp-content/uploads/2026/05/Cortex-by-IBS.mp4" type="video/mp4">
+            </video>
+
+            <!-- Cinematic HUD Overlays -->
+            <div style="position:absolute; inset:0; z-index:6; pointer-events:none; background: radial-gradient(circle at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.65) 92%);"></div>
+            <!-- Subtle scanlines -->
+            <div style="position:absolute; inset:0; z-index:7; pointer-events:none; background: repeating-linear-gradient(transparent, transparent 2px, rgba(255,255,255,0.035) 2px, rgba(255,255,255,0.035) 4px); mix-blend-mode: screen;"></div>
+            <!-- Top HUD bar -->
+            <div style="position:absolute; top:0; left:0; right:0; height: 28px; z-index:8; background: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent); display:flex; align-items:center; justify-content:space-between; padding:0 14px; font-family:'JetBrains Mono', monospace; font-size:9px; letter-spacing:1.5px; color:#475569; pointer-events:none;">
+              <div>CORTEX-03 • BAY 02 • <span id="hud-coords" style="color:#334155;">36.17°N 115.14°W</span></div>
+              <div style="display:flex; align-items:center; gap:6px;"><span id="hud-rec" style="color:#ef4444; font-weight:600; letter-spacing:2px; opacity:0;">● REC</span> <span id="hud-time" style="font-variant-numeric: tabular-nums;"></span></div>
+            </div>
+            <!-- Corner marks -->
+            <div style="position:absolute; top:12px; left:12px; width:18px; height:18px; border-top:1px solid #1f2937; border-left:1px solid #1f2937; z-index:8; pointer-events:none;"></div>
+            <div style="position:absolute; top:12px; right:12px; width:18px; height:18px; border-top:1px solid #1f2937; border-right:1px solid #1f2937; z-index:8; pointer-events:none;"></div>
+            <div style="position:absolute; bottom:12px; left:12px; width:18px; height:18px; border-bottom:1px solid #1f2937; border-left:1px solid #1f2937; z-index:8; pointer-events:none;"></div>
+            <div style="position:absolute; bottom:12px; right:12px; width:18px; height:18px; border-bottom:1px solid #1f2937; border-right:1px solid #1f2937; z-index:8; pointer-events:none;"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const canvas = document.getElementById('door-canvas');
+      const video = document.getElementById('cortex-video');
+      const leftBgVideo = document.getElementById('left-bg-video');
+      const inputEl = document.getElementById('deploy-input');
+      const logEl = document.getElementById('terminal-lines');
+      const statusEl = document.getElementById('mc-status');
+      const timerEl = document.getElementById('mc-timer');
+      const hudRec = document.getElementById('hud-rec');
+      const hudTime = document.getElementById('hud-time');
+      const playPauseBtn = document.getElementById('video-play-pause');
+
+      if (!canvas || typeof THREE === 'undefined') return;
+
+      // Play/Pause button for the video behind the doors
+      if (playPauseBtn && video) {
+        const updateBtn = () => {
+          if (video.paused || video.ended) {
+            playPauseBtn.textContent = '▶ PLAY';
+          } else {
+            playPauseBtn.textContent = '⏸ PAUSE';
+          }
+        };
+
+        playPauseBtn.addEventListener('click', () => {
+          if (video.paused || video.ended) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+          updateBtn();
+        });
+
+        video.addEventListener('play', updateBtn);
+        video.addEventListener('pause', updateBtn);
+        video.addEventListener('ended', updateBtn);
+      }
+
+      let renderer, scene, camera;
+      let leftDoor, rightDoor;
+      let particles;
+      let animationId;
+      let audioCtx;
+      let sequenceStarted = false;
+      let videoTimer = null;
+
+      const DOOR_OPEN_X = 8.2;   // fully out of frame
+      const DOOR_SWING = 0.22;   // radians outward rotation
+
+      function beep(freq = 1280, dur = 38, vol = 0.035) {
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          const f = audioCtx.createBiquadFilter();
+          o.type = 'sine';
+          o.frequency.value = freq;
+          f.type = 'lowpass';
+          f.frequency.value = 2400;
+          g.gain.value = vol;
+          const t = audioCtx.currentTime;
+          g.gain.setValueAtTime(vol, t);
+          g.gain.linearRampToValueAtTime(0.0001, t + dur/1000);
+          o.connect(f); f.connect(g); g.connect(audioCtx.destination);
+          o.start(t);
+          o.stop(t + dur/1000 + 0.02);
+        } catch(e){}
+      }
+
+      function initThree() {
+        renderer = new THREE.WebGLRenderer({ 
+          canvas, antialias: true, alpha: true, powerPreference: "high-performance"
+        });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+
+        scene = new THREE.Scene();
+        scene.fog = new THREE.Fog(0x050507, 9, 22);
+
+        camera = new THREE.PerspectiveCamera(46, canvas.clientWidth / canvas.clientHeight, 0.1, 60);
+        camera.position.set(0, 0.08, 6.4);
+        camera.lookAt(0, 0.1, 0);
+
+        // Dramatic cinematic lighting (hangar bay)
+        const ambient = new THREE.AmbientLight(0x0a0c12, 0.55);
+        scene.add(ambient);
+
+        const key = new THREE.DirectionalLight(0x9fb4ff, 1.35);
+        key.position.set(4.5, 9, 7);
+        scene.add(key);
+
+        const rim = new THREE.DirectionalLight(0x3b82f6, 0.9);
+        rim.position.set(-8, 1, -5);
+        scene.add(rim);
+
+        const fill = new THREE.DirectionalLight(0x1e2a44, 0.35);
+        fill.position.set(0, -4, 3);
+        scene.add(fill);
+
+        // Heavy hangar doors (gunmetal)
+        const doorGeo = new THREE.BoxGeometry(3.2, 4.35, 0.42);
+        const doorMat = new THREE.MeshPhongMaterial({
+          color: 0x11151f,
+          shininess: 22,
+          specular: 0x445566,
+          flatShading: false
+        });
+
+        leftDoor = new THREE.Mesh(doorGeo, doorMat);
+        rightDoor = new THREE.Mesh(doorGeo, doorMat);
+        leftDoor.position.set(-1.65, 0, 0);
+        rightDoor.position.set(1.65, 0, 0);
+        scene.add(leftDoor);
+        scene.add(rightDoor);
+
+        // Edge highlights on doors
+        const edgeMat = new THREE.LineBasicMaterial({ color: 0x334455, transparent: true, opacity: 0.28 });
+        [leftDoor, rightDoor].forEach(door => {
+          const e = new THREE.EdgesGeometry(doorGeo);
+          door.add(new THREE.LineSegments(e, edgeMat));
+        });
+
+        // (no floor, no central seal line — clean doors only)
+
+        // Subtle data particles (cinematic dust / telemetry)
+        const pCount = 68;
+        const pGeo = new THREE.BufferGeometry();
+        const pos = new Float32Array(pCount * 3);
+        const vel = [];
+        for (let i = 0; i < pCount; i++) {
+          pos[i*3] = (Math.random()-0.5) * 6.5;
+          pos[i*3+1] = (Math.random()-0.5) * 3.6;
+          pos[i*3+2] = (Math.random()-0.5) * 3 - 0.5;
+          vel.push((Math.random()-0.5)*0.0035, (Math.random()-0.5)*0.0022, (Math.random()-0.5)*0.0018);
+        }
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const pMat = new THREE.PointsMaterial({ color: 0x4a9eff, size: 0.018, transparent: true, opacity: 0.55, depthWrite: false });
+        particles = new THREE.Points(pGeo, pMat);
+        particles.userData = { vel, posArr: pos };
+        scene.add(particles);
+
+        // Resize handler
+        const onResize = () => {
+          renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+          camera.aspect = canvas.clientWidth / canvas.clientHeight;
+          camera.updateProjectionMatrix();
+        };
+        window.addEventListener('resize', onResize);
+
+        animate();
+      }
+
+      function animate() {
+        animationId = requestAnimationFrame(animate);
+
+        // Gentle camera breathing (cinematic aliveness)
+        const t = Date.now() * 0.0008;
+        camera.position.y = 0.08 + Math.sin(t * 0.7) * 0.012;
+        camera.position.x = Math.sin(t * 0.3) * 0.018;
+        camera.lookAt(0, 0.12, 0);
+
+        // Particle drift
+        if (particles && particles.userData.vel) {
+          const pos = particles.geometry.attributes.position;
+          const vel = particles.userData.vel;
+          for (let i = 0; i < vel.length; i += 3) {
+            const idx = i;
+            pos.array[idx]   += vel[idx];
+            pos.array[idx+1] += vel[idx+1];
+            pos.array[idx+2] += vel[idx+2];
+            // wrap around bay
+            if (pos.array[idx]   > 3.4) pos.array[idx]   = -3.4;
+            if (pos.array[idx]   < -3.4) pos.array[idx]   = 3.4;
+            if (pos.array[idx+1] > 2.1)  pos.array[idx+1] = -2.0;
+            if (pos.array[idx+1] < -2.1) pos.array[idx+1] = 2.0;
+          }
+          pos.needsUpdate = true;
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      // === CINEMATIC TEXT SEQUENCE ===
+      const bootLines = [
+        "CORTEX v16.4.2 — SECURE BOOT",
+        "Connecting to Base mainnet...",
+        "Wallet 0xB858...b3 online",
+        "x402 facilitator handshake complete",
+        "Loading mission parameters...",
+        "Autonomous execution layer ready",
+        "Visual feed authorization required"
+      ];
+
+      function typeLine(text, delay = 0) {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            const line = document.createElement('div');
+            line.style.cssText = 'margin-bottom:2.5px; color:#9ca3af; font-size:12.2px; letter-spacing:0.2px;';
+            logEl.appendChild(line);
+
+            let i = 0;
+            const speed = 17;
+            const iv = setInterval(() => {
+              line.textContent = text.substring(0, i);
+              if (i % 2 === 0) beep(1320 + (i%3)*40, 22, 0.018);
+              i++;
+              if (i > text.length) {
+                clearInterval(iv);
+                beep(980, 26, 0.022);
+                line.innerHTML = colorizeBootLine(text);
+                resolve();
+              }
+            }, speed);
+          }, delay);
+        });
+      }
+
+      function colorizeBootLine(text) {
+        let html = text;
+        // System / cyan
+        html = html.replace(/CORTEX/g, '<span style="color:#67e8f9">CORTEX</span>');
+        html = html.replace(/Connecting to/g, '<span style="color:#67e8f9">Connecting to</span>');
+        html = html.replace(/Loading mission parameters/g, '<span style="color:#67e8f9">Loading mission parameters</span>');
+        html = html.replace(/Visual feed authorization required/g, '<span style="color:#67e8f9">Visual feed authorization required</span>');
+
+        // Gold highlights
+        html = html.replace(/v16\.4\.2/g, '<span style="color:#f0c040">v16.4.2</span>');
+        html = html.replace(/Base mainnet/g, '<span style="color:#f0c040">Base mainnet</span>');
+        html = html.replace(/SECURE BOOT/g, '<span style="color:#f0c040">SECURE BOOT</span>');
+
+        // Green / success
+        html = html.replace(/0xB858\.\.\.b3 online/g, '<span style="color:#22c55e">0xB858...b3 online</span>');
+        html = html.replace(/handshake complete/g, '<span style="color:#22c55e">handshake complete</span>');
+        html = html.replace(/execution layer ready/g, '<span style="color:#22c55e">execution layer ready</span>');
+
+        // Purple / special
+        html = html.replace(/x402 facilitator/g, '<span style="color:#a78bfa">x402 facilitator</span>');
+
+        return html;
+      }
+
+      async function runTextSequence() {
+        logEl.innerHTML = '';
+        for (let i = 0; i < bootLines.length; i++) {
+          await typeLine(bootLines[i], i === 0 ? 40 : 265);
+        }
+        await new Promise(r => setTimeout(r, 520));
+        return true;
+      }
+
+      // === DOOR ANIMATION (heavy, cinematic) ===
+      function openDoors() {
+        return new Promise(resolve => {
+          const dur = 1620;
+          const start = Date.now();
+          const lStartX = leftDoor.position.x;
+          const rStartX = rightDoor.position.x;
+
+          function tick() {
+            const t = Math.min((Date.now() - start) / dur, 1);
+            const e = 1 - Math.pow(1 - t, 3.35); // weighty ease
+
+            leftDoor.position.x  = lStartX - (DOOR_OPEN_X * e);
+            rightDoor.position.x = rStartX + (DOOR_OPEN_X * e);
+
+            leftDoor.rotation.y  = -DOOR_SWING * e;
+            rightDoor.rotation.y =  DOOR_SWING * e;
+
+            // slight forward push as they open (bay reveal)
+            leftDoor.position.z  = 0.06 * Math.sin(e * Math.PI);
+            rightDoor.position.z = 0.06 * Math.sin(e * Math.PI);
+
+            if (t < 1) {
+              requestAnimationFrame(tick);
+            } else {
+              leftDoor.position.z = 0;
+              rightDoor.position.z = 0;
+              resolve();
+            }
+          }
+          tick();
+        });
+      }
+
+      function closeDoors() {
+        return new Promise(resolve => {
+          const dur = 1380;
+          const start = Date.now();
+          const lStartX = leftDoor.position.x;
+          const rStartX = rightDoor.position.x;
+          const lStartRot = leftDoor.rotation.y;
+          const rStartRot = rightDoor.rotation.y;
+
+          function tick() {
+            const t = Math.min((Date.now() - start) / dur, 1);
+            const e = Math.pow(t, 2.95);
+
+            leftDoor.position.x  = lStartX + ((-1.65 - lStartX) * e);
+            rightDoor.position.x = rStartX + (( 1.65 - rStartX) * e);
+
+            leftDoor.rotation.y  = lStartRot + ((-0.0 - lStartRot) * e);
+            rightDoor.rotation.y = rStartRot + (( 0.0 - rStartRot) * e);
+
+            if (t < 1) {
+              requestAnimationFrame(tick);
+            } else {
+              leftDoor.position.set(-1.65, 0, 0);
+              rightDoor.position.set(1.65, 0, 0);
+              leftDoor.rotation.y = 0;
+              rightDoor.rotation.y = 0;
+              resolve();
+            }
+          }
+          tick();
+        });
+      }
+
+      // === FULL SEQUENCE (per user spec) ===
+      async function startSequence() {
+        if (sequenceStarted) return;
+        sequenceStarted = true;
+
+        inputEl.disabled = true;
+        inputEl.style.opacity = '0.35';
+
+        statusEl.textContent = 'EXECUTING';
+        statusEl.style.color = '#f59e0b';
+
+        // Start the video behind the doors with audio as the sequence begins
+        video.style.display = 'block';
+        video.style.opacity = '1';
+        video.currentTime = 0;
+        video.volume = 0.9;
+        video.play().catch(() => {});
+
+        // Left chat pane background video (boot animation) - fade in from black on Enter
+        if (leftBgVideo) {
+          leftBgVideo.style.transition = 'opacity 650ms ease';
+          leftBgVideo.style.opacity = '0.58';
+          leftBgVideo.currentTime = 0;
+          leftBgVideo.play().catch(() => {});
+        }
+
+        if (playPauseBtn) playPauseBtn.textContent = '⏸ PAUSE';
+
+        // 2. Start doors opening immediately
+        const doorP = openDoors();
+
+        // 3. Start the left code boot sequence immediately (in parallel)
+        // We run the text while the video is already playing and doors are opening
+        const textP = runTextSequence();
+
+        // Wait for both doors and text to finish their main actions
+        await Promise.all([doorP, textP]);
+
+        // After code on left finishes: leave the left video background visible and looping
+        // (do NOT dim the left pane - user wants it to stay showing the video while right video plays)
+
+        statusEl.textContent = 'LIVE FEED';
+        statusEl.style.color = '#22c55e';
+        if (hudRec) hudRec.style.opacity = '1';
+
+        // Live HUD timer synced to video
+        if (videoTimer) clearInterval(videoTimer);
+        videoTimer = setInterval(() => {
+          if (!video.paused && !video.ended) {
+            const s = Math.floor(video.currentTime);
+            const m = Math.floor(s / 60);
+            const ss = s % 60;
+            if (timerEl) timerEl.textContent = `00:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+            if (hudTime) hudTime.textContent = `${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+          }
+        }, 180);
+
+        // Auto close on video end (doors close, full reset)
+        video.onended = async () => {
+          if (videoTimer) { clearInterval(videoTimer); videoTimer = null; }
+          statusEl.textContent = 'CLOSING';
+          statusEl.style.color = '#f59e0b';
+          if (hudRec) hudRec.style.opacity = '0';
+          if (hudTime) hudTime.textContent = '';
+
+          // Fade left pane video back to black bg when right video finishes
+          if (leftBgVideo) {
+            leftBgVideo.style.transition = 'opacity 650ms ease';
+            leftBgVideo.style.opacity = '0';
+            setTimeout(() => {
+              leftBgVideo.pause();
+              leftBgVideo.currentTime = 0;
+            }, 700);
+          }
+
+          await closeDoors();
+
+          video.style.transition = 'opacity 520ms ease';
+          video.style.opacity = '0';
+
+          setTimeout(() => {
+            video.style.display = 'none';
+            video.style.opacity = '1';
+            video.pause();
+            video.currentTime = 0;
+          }, 520);
+
+          statusEl.textContent = 'STANDBY';
+          statusEl.style.color = '#22c55e';
+          if (timerEl) timerEl.textContent = '00:00:00';
+
+          if (playPauseBtn) playPauseBtn.textContent = '▶ PLAY';
+
+          // Full reset
+          if (leftBgVideo) {
+            leftBgVideo.style.transition = 'none';
+            leftBgVideo.style.opacity = '0';
+          }
+
+          sequenceStarted = false;
+          inputEl.disabled = false;
+          inputEl.style.opacity = '1';
+          inputEl.value = '';
+          logEl.innerHTML = '';
+        };
+      }
+
+      // Input handler
+      function setupInput() {
+        // Clear the initial hint as soon as user engages
+        const clearHint = () => {
+          if (logEl && logEl.children.length === 1) {
+            const first = logEl.firstChild;
+            if (first && first.textContent && first.textContent.includes('deploy cortex')) {
+              logEl.innerHTML = '';
+            }
+          }
+        };
+        inputEl.addEventListener('focus', clearHint, { once: true });
+        inputEl.addEventListener('keydown', function(e) {
+          clearHint();
+          if (e.key === 'Enter' && !sequenceStarted) {
+            const val = inputEl.value.trim().toLowerCase();
+            if (val === 'deploy cortex') {
+              startSequence();
+            } else if (val.length > 0) {
+              const err = document.createElement('div');
+              err.style.cssText = 'color:#ef4444; font-size:11.5px; margin:3px 0 1px;';
+              err.textContent = 'INVALID COMMAND — TYPE: deploy cortex';
+              logEl.appendChild(err);
+              setTimeout(() => { if (err.parentNode) err.parentNode.removeChild(err); }, 1350);
+              beep(420, 80, 0.06);
+            }
+            inputEl.value = '';
+          }
+        });
+
+        // Focus on click anywhere in the bay area
+        const term = document.getElementById('cortex-terminal');
+        term.addEventListener('click', () => {
+          if (!sequenceStarted) inputEl.focus();
+        });
+
+        // Initial subtle prompt blink
+        setTimeout(() => {
+          if (!sequenceStarted && inputEl) inputEl.placeholder = 'deploy cortex';
+        }, 420);
+      }
+
+      function boot() {
+        // Init Three.js immediately so logo + doors are visible on first paint
+        initThree();
+        setupInput();
+
+        // Seed a subtle but obvious hint so first-time users know exactly what to type
+        setTimeout(() => {
+          if (logEl && logEl.children.length === 0 && !sequenceStarted) {
+            const hint = document.createElement('div');
+            hint.style.cssText = 'margin-bottom:4px; color:#475569; font-size:11px; opacity:0.75;';
+            hint.textContent = '// bay sealed — type "deploy cortex" to open visual feed';
+            logEl.appendChild(hint);
+          }
+        }, 420);
+
+        // Observe for any late resize or visibility tweaks
+        const obs = new IntersectionObserver((ents) => {
+          if (ents[0].isIntersecting && renderer) {
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.updateProjectionMatrix();
+          }
+        }, { threshold: 0.1 });
+        const sec = document.getElementById('cortex-terminal');
+        if (sec) obs.observe(sec);
+      }
+
+      boot();
+    })();
+  </script>
+
+  <!-- One Engine. Multiple Frontiers. -->
+  <div class="max-w-6xl mx-auto px-8 py-16 border-t border-[#2c2e38]">
+    <div class="max-w-3xl">
+      <div class="text-xs font-semibold tracking-[3px] text-[#a1a1aa] mb-3">ONE ENGINE. MULTIPLE FRONTIERS.</div>
+      <div class="text-4xl font-semibold tracking-tighter leading-none mb-6">The same intelligence layer powers workflows across real estate, lending, mortgage, and logistics.</div>
+      <p class="text-[#a1a1aa] text-lg mb-8">Discover is one surface. The real-time enrichment, scoring, and autonomous execution engine behind it runs across multiple industries — all on Base.</p>
+      
+      <a href="https://cortexibs.com/grid.html" 
+         class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl border border-[#2c2e38] hover:border-[#3b82f6] hover:text-[#3b82f6] text-sm font-medium transition-all">
+        Explore all Cortex demos <i class="fa-solid fa-arrow-right text-xs"></i>
       </a>
-      <p class="hero-tagline">
-        IBS builds the autonomous infrastructure that runs lending, advisory, and supply chain operations end to end.
-      </p>
-    </div>
-  </div>
-  <div class="hero-scroll">
-    <span>Scroll</span>
-    <span class="line"></span>
-  </div>
-</section>
-
-<!-- 01 THE SHIFT -->
-<section class="section reveal" id="shift">
-  <div class="section-num">01 The Shift</div>
-  <h2 class="section-heading">Financial operations have always meant a person doing on Tuesday what they did on Monday.</h2>
-  <p class="section-body">
-    Calling the same client list. Scoring the same portfolios. Chasing the same payments. Verifying the same shipments. The work was repetitive because the rails couldn't carry it any other way.
-  </p>
-  <p class="section-body">
-    That changed quietly, in three places at once.
-  </p>
-  <p class="section-body">
-    <em>AI got smart enough to reason.</em> Not autocomplete. Reason.
-  </p>
-  <p class="section-body">
-    <em>Blockchain settlement got fast enough and cheap enough</em> to move money in seconds for fractions of a cent. And payments became native to HTTP, so software could finally pay software without a human signing anything.
-  </p>
-  <p class="section-body">
-    Three rails. One moment.
-  </p>
-  <p class="section-body">
-    Everything that used to need a person on the other end suddenly didn't.
-  </p>
-  <p class="section-coda">
-    The infrastructure caught up. The operations haven't. We're closing the gap.
-  </p>
-</section>
-
-<!-- 02 THE ARCHITECTURE -->
-<section class="section reveal" id="architecture">
-  <div class="section-num">02 The Architecture</div>
-  <h2 class="section-heading">CORTEX isn't a product. It's the infrastructure underneath every IBS deployment.</h2>
-
-  <div class="arch-grid">
-    <div class="arch-block">
-      <div class="arch-label">Listen</div>
-      <div class="arch-text">
-        <strong>We meet you in the tools you already use.</strong> CORTEX plugs into Encompass exports, CRM client lists, IoT sensors, on chain events. Wherever your operation already lives. No migration. No platform of record demands. The data comes to the agents, not the other way around.
-      </div>
-    </div>
-    <div class="arch-block">
-      <div class="arch-label">Reason</div>
-      <div class="arch-text">
-        <strong>Signals in. Decisions out.</strong> Every input gets evaluated against the rules you set and the patterns the system has learned. A rate spread, a stalled loan, a sensor anomaly. The output isn't a dashboard of numbers. It's a ranked, prioritized, reasoned answer to the question your team was already asking.
-      </div>
-    </div>
-    <div class="arch-block">
-      <div class="arch-label">Act</div>
-      <div class="arch-text">
-        <strong>Agent v16 takes it from there.</strong> Once a decision is reached, Agent v16 moves. It writes the email. It places the call. It mints the loan NFT, funds the vault, books the escrow. It carries its own wallet and settles its own microtransactions on chain. No queue. No ticket. No human in the loop unless one belongs there.
-      </div>
-    </div>
-    <div class="arch-block">
-      <div class="arch-label">Verify</div>
-      <div class="arch-text">
-        <strong>Every action leaves a hash.</strong> Every loan, every shipment, every contract execution lands on chain. Anyone can rehash the source data and prove it hasn't been tampered with. The system isn't asking you to trust it. It's giving you the receipts.
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 03 THE PRODUCT SURFACE -->
-<section class="section reveal" id="products">
-  <div class="section-num">03 The Product Surface</div>
-  <h2 class="section-heading">Three products. One engine.</h2>
-  <p class="section-lede">
-    Each one is a piece of finance or operations that used to need a team, and doesn't anymore.
-  </p>
-
-  <div class="product-list">
-    <div class="product-card">
-      <div class="product-name">CORTEX Mortgage</div>
-      <p>
-        Your client list is already a goldmine. We just turn the lights on. Connects to your existing book, enriches every property with live valuations, and ranks who's ready to act today. Equity positions, PMI candidates, rate spreads, refi opportunities. Surfaced, scored, and routed into outreach across six channels.
-      </p>
-    </div>
-    <div class="product-card">
-      <div class="product-name">IMC Auto Lending</div>
-      <p>
-        A loan that originates, funds, and services itself. A borrower applies. An underwriter approves. From that moment forward, no human touches the loan. Agent v16 mints the NFT, deploys the vault, places the welcome call, and monitors every payment on a 10 minute heartbeat. Investors fund in USDC. Borrowers repay on chain. Delinquencies escalate through eight levels, automatically, with the 90 day flag landing on the blockchain itself. A back office that doesn't need a back office.
-      </p>
-    </div>
-    <div class="product-card">
-      <div class="product-name">Logistix</div>
-      <p>
-        Tamper proof supply chains, in plain language. IoT sensors track every shipment in real time. Major checkpoints anchor to the blockchain with a hash of the full sensor bundle. Anyone can verify integrity by rehashing. Ask any question about any shipment in plain English, and get an answer that's cryptographically backed.
-      </p>
     </div>
   </div>
 
-  <p class="section-coda">
-    Three products. One engine. All in production today.
-  </p>
-</section>
+  <!-- Features -->
+  <div id="features" class="max-w-6xl mx-auto px-8 pt-20 pb-16 relative" style="background: linear-gradient(180deg, rgba(10,11,15,0.65) 0%, rgba(10,11,15,0.55) 38%, rgba(10,11,15,0.62) 100%), url('./assets/dxr-data-flow-bg.jpg') center/cover; background-attachment: fixed; border-radius: 24px; padding-top: 3rem; padding-bottom: 3rem; margin-top: 1rem; overflow: hidden;">
+    <div class="max-w-2xl mb-12">
+      <div class="text-xs font-semibold tracking-[3px] text-[#a1a1aa]">BUILT DIFFERENT</div>
+      <div class="text-5xl font-semibold tracking-tighter leading-none mt-3">Everything you need.<br>Nothing you don’t.</div>
+    </div>
 
-<!-- 04 IN PRODUCTION -->
-<section class="section reveal" id="production">
-  <div class="section-num">04 In Production</div>
-  <h2 class="section-heading">Not slideware. Not pilots. Running.</h2>
-
-  <div class="deployment-list">
-    <div class="deployment-card">
-      <div class="deployment-row">
-        <div class="deployment-title">PRMG</div>
-        <div class="deployment-meta deployment-status">CORTEX Mortgage / Live</div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="p-8 rounded-3xl bg-[#121317] border border-[#2c2e38]">
+        <i class="fa-solid fa-map text-3xl text-[#3b82f6] mb-6"></i>
+        <div class="font-semibold text-xl mb-2">Live Interactive Map</div>
+        <p class="text-[#a1a1aa]">See every filing plotted in real time with color-coded Pre-NOD heat.</p>
       </div>
-      <p>
-        A top producer's portfolio. 286 clients. $49M in identified equity. One hot lead saving $373/month. Three active refi candidates. Fifty nine below market rate holders flagged for followup.
-      </p>
-    </div>
-    <div class="deployment-card">
-      <div class="deployment-row">
-        <div class="deployment-title">Illuminate Your Wealth</div>
-        <div class="deployment-meta deployment-status">Bay Area Advisory / Deploying</div>
+      <div class="p-8 rounded-3xl bg-[#121317] border border-[#2c2e38]">
+        <i class="fa-solid fa-brain text-3xl text-[#3b82f6] mb-6"></i>
+        <div class="font-semibold text-xl mb-2">Synthetic Pre-NOD</div>
+        <p class="text-[#a1a1aa]">Proprietary 12-month default risk score. 0% false positives in back-testing above 65.</p>
       </div>
-      <p>
-        Frontend live. Backend deploying. A second vertical inside the same engine.
-      </p>
-    </div>
-    <div class="deployment-card">
-      <div class="deployment-row">
-        <div class="deployment-title">IMC Marketplace</div>
-        <div class="deployment-meta deployment-status">Base Sepolia / End to end</div>
+      <div class="p-8 rounded-3xl bg-[#121317] border border-[#2c2e38]">
+        <i class="fa-solid fa-chart-line text-3xl text-[#3b82f6] mb-6"></i>
+        <div class="font-semibold text-xl mb-2">Neighborhood Intelligence</div>
+        <p class="text-[#a1a1aa]">Census ACS, FEMA flood, and school proximity data are automatically attached to every lead.</p>
       </div>
-      <p>
-        Live. From application to NFT mint to vault funding to repayment to delinquency monitoring. The engine running the back office.
-      </p>
-    </div>
-    <div class="deployment-card">
-      <div class="deployment-row">
-        <div class="deployment-title">Logistix</div>
-        <div class="deployment-meta deployment-status">Smart Contracts / On chain</div>
+      <div class="p-8 rounded-3xl bg-[#121317] border border-[#2c2e38]">
+        <i class="fa-solid fa-download text-3xl text-[#3b82f6] mb-6"></i>
+        <div class="font-semibold text-xl mb-2">One-Click Export</div>
+        <p class="text-[#a1a1aa]">CSV or direct push into your existing scoring system. Already wired in core DXR.</p>
       </div>
-      <p>
-        Contracts deployed and verified on chain. Dashboard live with a 100 shipment mock network. IoT hardware in transit. Real GPS feeds replace mock data on activation.
-      </p>
+      <div class="p-8 rounded-3xl bg-[#121317] border border-[#2c2e38]">
+        <i class="fa-solid fa-sync text-3xl text-[#3b82f6] mb-6"></i>
+        <div class="font-semibold text-xl mb-2">Batch Enrichment</div>
+        <p class="text-[#a1a1aa]">Run an entire scan overnight. Wake up to fully enriched, prioritized leads.</p>
+      </div>
+      <div class="p-8 rounded-3xl bg-[#121317] border border-[#2c2e38]">
+        <i class="fa-solid fa-user-secret text-3xl text-[#3b82f6] mb-6"></i>
+        <div class="font-semibold text-xl mb-2">Skip Trace Ready</div>
+        <p class="text-[#a1a1aa]">One-click research links and owner-type detection on every enriched record.</p>
+      </div>
     </div>
   </div>
 
-  <p class="section-coda">
-    This isn't a deck. It's running.
-  </p>
-</section>
+  <!-- Stack -->
+  <div class="max-w-5xl mx-auto px-8 py-14 border-t border-[#2c2e38]">
+    <div class="text-center mb-8">
+      <div class="text-xs font-semibold tracking-[3px] text-[#a1a1aa]">INTELLIGENCE LAYER</div>
+    </div>
 
-<!-- 05 THE ENGINE -->
-<section class="section reveal" id="engine">
-  <div class="section-num">05 The Engine</div>
-  <div class="engine-badge">Agent v16</div>
-  <h2 class="section-heading">Meet Agent v16.</h2>
+    <div id="intelligence-grid" class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
+      <div class="text-center">
+        <img src="./assets/xai-logomark.png" alt="xAI" class="h-10 w-auto mx-auto mb-3 opacity-90">
+        <div class="text-[10px] tracking-[2.5px] text-[#a1a1aa] font-medium">xAI</div>
+      </div>
+      <div class="text-center">
+        <img src="./assets/grok-logomark.png" alt="Grok" class="h-10 w-auto mx-auto mb-3 opacity-90">
+        <div class="text-[10px] tracking-[2.5px] text-[#a1a1aa] font-medium">Grok</div>
+      </div>
+      <div class="text-center">
+        <img src="./assets/anthropic-logo.png" alt="Anthropic" class="h-7 w-auto mx-auto mb-3 opacity-90">
+        <div class="text-[10px] tracking-[2.5px] text-[#a1a1aa] font-medium">Anthropic</div>
+      </div>
+      <div class="text-center">
+        <img src="./assets/attom-logo.png" alt="ATTOM" class="h-7 w-auto mx-auto mb-3 opacity-90">
+        <div class="text-[10px] tracking-[2.5px] text-[#a1a1aa] font-medium">ATTOM Data</div>
+      </div>
+    </div>
 
-  <p class="section-body">
-    Agent v16 is the autonomous execution layer underneath every IBS product. It carries a wallet. It places voice calls. It sends emails. It mints NFTs, funds vaults, books escrow, monitors delinquencies, and escalates through eight levels without anyone tapping it on the shoulder.
-  </p>
-  <p class="section-body">
-    When it needs to spend, for a voice minute, an API call, a settlement, it pays itself. On chain. In seconds. Micro fees, sub second, no human signing off on every five cent action.
-  </p>
-  <p class="section-body">
-    What Agent v16 <em>doesn't</em> do is decide the things humans should decide. Underwriting approvals. Strategy. Pricing. Policy. Those stay with you. Agent v16 works inside the lanes you draw, and inside those lanes, it doesn't ask twice.
-  </p>
+    <p class="text-center text-[#a1a1aa] text-sm mt-9 max-w-lg mx-auto">Frontier models for reasoning. Licensed property data for ground truth. The same infrastructure behind our lending, voice, and on-chain systems.</p>
+  </div>
 
-  <p class="section-coda">
-    You set the guardrails. Agent v16 runs the road.
-  </p>
-</section>
+  <!-- FAQ -->
+  <div id="faq" class="max-w-4xl mx-auto px-8 py-20">
+    <div class="text-center mb-12">
+      <div class="text-xs font-semibold tracking-[3px] text-[#a1a1aa]">CLARITY</div>
+      <div class="text-5xl font-semibold tracking-tighter leading-none mt-3">Frequently asked.</div>
+      <p class="mt-4 text-[#a1a1aa] max-w-md mx-auto">Straight answers on how the signal works and what you actually get.</p>
+    </div>
 
-<!-- 06 CLOSING -->
-<section class="section closing reveal" id="closing">
-  <div class="section-num">06 Closing</div>
-  <h2 class="closing-line">The operation runs itself.</h2>
-  <a href="./experience.html" class="closing-cta">
-    See what's running <span class="arrow">→</span>
-  </a>
-</section>
+    <div class="space-y-3">
+      <!-- Q1 -->
+      <div class="faq-item bg-[#121317] border border-[#2c2e38] rounded-3xl overflow-hidden">
+        <button onclick="toggleFAQ(this)" class="faq-question w-full flex items-center justify-between px-8 py-6 text-left group">
+          <div class="flex items-center gap-4">
+            <span class="font-mono text-[10px] tracking-[2px] text-[#3b82f6]/60 font-medium">01</span>
+            <span class="font-semibold text-lg tracking-[-0.2px]">What signals does DXR Discover actually surface?</span>
+          </div>
+          <i class="fa-solid fa-chevron-down faq-chevron text-[#a1a1aa] group-hover:text-white"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner px-8 text-[#a1a1aa]">
+            Fresh county recorder filings the same day or next day they hit public record. This includes notices of default, lis pendens, tax liens, and other distress triggers across Clark, Riverside, and additional counties we are actively wiring. Every record is then enriched with ATTOM owner data, equity estimates, neighborhood context, and our proprietary Pre-NOD score.
+          </div>
+        </div>
+      </div>
 
-<div class="foot">
-  Innovative Blockchain Solutions &nbsp;·&nbsp; Las Vegas
-</div>
+      <!-- Q2 -->
+      <div class="faq-item bg-[#121317] border border-[#2c2e38] rounded-3xl overflow-hidden">
+        <button onclick="toggleFAQ(this)" class="faq-question w-full flex items-center justify-between px-8 py-6 text-left group">
+          <div class="flex items-center gap-4">
+            <span class="font-mono text-[10px] tracking-[2px] text-[#3b82f6]/60 font-medium">02</span>
+            <span class="font-semibold text-lg tracking-[-0.2px]">How is this different from the regular DXR Scanner?</span>
+          </div>
+          <i class="fa-solid fa-chevron-down faq-chevron text-[#a1a1aa] group-hover:text-white"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner px-8 text-[#a1a1aa]">
+            The core DXR Scanner scores lists you already own. Discover finds the new filings you did not know existed. It is the front end of the pipeline: the live feed of fresh distress signals before they ever appear on a list you can buy or scrape.
+          </div>
+        </div>
+      </div>
 
-<script>
-/* ── REVEAL on scroll ── */
-(() => {
-  const els = document.querySelectorAll('.reveal');
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      if (e.isIntersecting) {
-        e.target.classList.add('in');
-        io.unobserve(e.target);
+      <!-- Q3 -->
+      <div class="faq-item bg-[#121317] border border-[#2c2e38] rounded-3xl overflow-hidden">
+        <button onclick="toggleFAQ(this)" class="faq-question w-full flex items-center justify-between px-8 py-6 text-left group">
+          <div class="flex items-center gap-4">
+            <span class="font-mono text-[10px] tracking-[2px] text-[#3b82f6]/60 font-medium">03</span>
+            <span class="font-semibold text-lg tracking-[-0.2px]">How fresh is the data?</span>
+          </div>
+          <i class="fa-solid fa-chevron-down faq-chevron text-[#a1a1aa] group-hover:text-white"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner px-8 text-[#a1a1aa]">
+            We pull recorder data daily. Most new filings appear in Discover within 24 to 48 hours. Equity, owner, and neighborhood layers are attached the same day via ATTOM plus federal overlays.
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="faq-item bg-[#121317] border border-[#2c2e38] rounded-3xl overflow-hidden">
+        <button onclick="toggleFAQ(this)" class="faq-question w-full flex items-center justify-between px-8 py-6 text-left group">
+          <div class="flex items-center gap-4">
+            <span class="font-mono text-[10px] tracking-[2px] text-[#3b82f6]/60 font-medium">04</span>
+            <span class="font-semibold text-lg tracking-[-0.2px]">What is the Pre-NOD score and how reliable is it?</span>
+          </div>
+          <i class="fa-solid fa-chevron-down faq-chevron text-[#a1a1aa] group-hover:text-white"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner px-8 text-[#a1a1aa]">
+            A 0 to 100 synthetic default risk model built on historical outcomes. In Clark County back-testing, scores above 65 have shown 0% false positives for actual NODs within 12 months. It is not a crystal ball. It is a sharp filter that surfaces the highest-conviction situations first.
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="faq-item bg-[#121317] border border-[#2c2e38] rounded-3xl overflow-hidden">
+        <button onclick="toggleFAQ(this)" class="faq-question w-full flex items-center justify-between px-8 py-6 text-left group">
+          <div class="flex items-center gap-4">
+            <span class="font-mono text-[10px] tracking-[2px] text-[#3b82f6]/60 font-medium">05</span>
+            <span class="font-semibold text-lg tracking-[-0.2px]">Do I need to be an existing DXR customer?</span>
+          </div>
+          <i class="fa-solid fa-chevron-down faq-chevron text-[#a1a1aa] group-hover:text-white"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner px-8 text-[#a1a1aa]">
+            No. DXR Discover is a standalone product. You can run it completely independently, or pair it with the core Scanner later for the hybrid workflow most power users eventually want.
+          </div>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="faq-item bg-[#121317] border border-[#2c2e38] rounded-3xl overflow-hidden">
+        <button onclick="toggleFAQ(this)" class="faq-question w-full flex items-center justify-between px-8 py-6 text-left group">
+          <div class="flex items-center gap-4">
+            <span class="font-mono text-[10px] tracking-[2px] text-[#3b82f6]/60 font-medium">06</span>
+            <span class="font-semibold text-lg tracking-[-0.2px]">How do I get the leads into my CRM or email tools?</span>
+          </div>
+          <i class="fa-solid fa-chevron-down faq-chevron text-[#a1a1aa] group-hover:text-white"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner px-8 text-[#a1a1aa]">
+            One-click CSV export is live today. We are currently rolling out direct pushes (API and native connectors for the major mortgage CRMs). Ask during the demo and we will show you the current export options and what is shipping next.
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="faq-item bg-[#121317] border border-[#2c2e38] rounded-3xl overflow-hidden">
+        <button onclick="toggleFAQ(this)" class="faq-question w-full flex items-center justify-between px-8 py-6 text-left group">
+          <div class="flex items-center gap-4">
+            <span class="font-mono text-[10px] tracking-[2px] text-[#3b82f6]/60 font-medium">07</span>
+            <span class="font-semibold text-lg tracking-[-0.2px]">What kind of volume should I expect?</span>
+          </div>
+          <i class="fa-solid fa-chevron-down faq-chevron text-[#a1a1aa] group-hover:text-white"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner px-8 text-[#a1a1aa]">
+            Clark County alone typically surfaces 60 to 120 high-signal filings per week. Other counties vary. We prioritize quality and actionability over raw count. Every lead that hits your dashboard has already passed multiple enrichment and scoring gates.
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="faq-item bg-[#121317] border border-[#2c2e38] rounded-3xl overflow-hidden">
+        <button onclick="toggleFAQ(this)" class="faq-question w-full flex items-center justify-between px-8 py-6 text-left group">
+          <div class="flex items-center gap-4">
+            <span class="font-mono text-[10px] tracking-[2px] text-[#3b82f6]/60 font-medium">08</span>
+            <span class="font-semibold text-lg tracking-[-0.2px]">Is the data private and compliant?</span>
+          </div>
+          <i class="fa-solid fa-chevron-down faq-chevron text-[#a1a1aa] group-hover:text-white"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner px-8 text-[#a1a1aa]">
+            Everything lives in your isolated tenant. We never resell or redistribute leads. All data is sourced from public records and licensed ATTOM feeds. You control export and retention.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 text-center">
+      <p class="text-[#a1a1aa] mb-5">Still have questions about fit, volume, or integration?</p>
+      <a href="https://calendly.com/ibs_lasvegas/dxr-discover-demo" target="_blank" 
+         class="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-3xl border border-[#2c2e38] hover:border-[#3b82f6] hover:text-[#3b82f6] transition-all active:scale-[0.985]">
+        <span>Request a private walkthrough</span>
+        <i class="fa-solid fa-arrow-right text-xs"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- The System -->
+  <div id="the-system" class="relative py-20 border-t border-[#2c2e38] overflow-hidden" 
+       style="background-image: url('./assets/skyscrapers-bg.jpg'); background-size: cover; background-position: center; background-attachment: fixed;">
+    <div class="absolute inset-0 bg-gradient-to-b from-[#0b0c10]/70 via-[#0b0c10]/55 to-[#0b0c10]/75"></div>
+
+    <div class="relative max-w-3xl mx-auto px-8">
+      <div class="text-center mb-8">
+        <div class="text-xs font-semibold tracking-[3px] text-[#a1a1aa]">THE SYSTEM</div>
+        <div class="text-5xl font-semibold tracking-tighter leading-none mt-3 text-white">We got tired of stale lists.</div>
+      </div>
+
+      <div class="text-[#e5e5f0] text-[15px] leading-relaxed space-y-6 max-w-2xl mx-auto">
+        <p>DXR Discover is the fresh-signal product from Innovative Blockchain Solutions. We build on-chain systems for real-world industries out of Las Vegas. Our platforms span lending, logistics, mortgage, voice CRM, and paid data. Every product runs on Base.</p>
+
+        <p>The core DXR Scanner scores lists you already own. Discover exists because most good opportunities never make it onto a list you can buy. We pull county recorder data daily, enrich it through ATTOM, apply the same scoring models used across our other systems, and surface only what is actionable right now.</p>
+
+        <p>No assumptions. No recycled data. Just the filings as they appear, with the context that actually moves the needle.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing -->
+  <div id="pricing" class="max-w-6xl mx-auto px-8 py-20 border-t border-[#2c2e38]">
+    <div class="text-center mb-12">
+      <div class="text-xs font-semibold tracking-[3px] text-[#a1a1aa]">PRICING</div>
+      <div class="text-5xl font-semibold tracking-tighter leading-none mt-3">Annual credits.<br>No monthly subscriptions.</div>
+      <p class="mt-4 text-[#a1a1aa] max-w-lg mx-auto">Prepaid annual pools. Credits never expire. Pay for what you use within the year. Rex metered on Professional, unlimited on Enterprise.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      
+      <!-- Essentials -->
+      <div class="bg-[#121317] border border-[#2c2e38] rounded-3xl p-8 flex flex-col">
+        <div>
+          <div class="text-sm font-semibold tracking-[1px] text-[#a1a1aa]">ESSENTIALS</div>
+          <div class="mt-4 flex items-baseline gap-1">
+            <span class="text-5xl font-semibold tracking-tighter">$4,800</span>
+            <span class="text-[#a1a1aa]">/ year</span>
+          </div>
+          <div class="text-xs text-[#a1a1aa] mt-1">3 users • 2,500 leads</div>
+        </div>
+
+        <div class="mt-8 space-y-3 text-sm flex-1">
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> Daily fresh recorder signals</div>
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> Full ATTOM + federal enrichment</div>
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> Proprietary Pre-NOD scoring</div>
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> Standard CSV export</div>
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> 3 user seats</div>
+        </div>
+
+        <button data-discover-plan="essentials"
+           class="mt-8 w-full text-center px-6 py-3 rounded-2xl border border-[#2c2e38] hover:border-[#3b82f6] text-sm font-medium transition-all">
+          Get Essentials
+        </button>
+      </div>
+
+      <!-- Professional -->
+      <div class="bg-[#121317] border border-[#2c2e38] rounded-3xl p-8 flex flex-col">
+        <div>
+          <div class="text-sm font-semibold tracking-[1px] text-[#a1a1aa]">PROFESSIONAL</div>
+          <div class="mt-4 flex items-baseline gap-1">
+            <span class="text-5xl font-semibold tracking-tighter">$7,200</span>
+            <span class="text-[#a1a1aa]">/ year</span>
+          </div>
+          <div class="text-xs text-[#a1a1aa] mt-1">5 users • 7,500 leads</div>
+        </div>
+
+        <div class="mt-8 space-y-3 text-sm flex-1">
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> Everything in Essentials</div>
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> 5 user seats</div>
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> Priority batch enrichment</div>
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> Enhanced exports + formats</div>
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> <strong>Rex voice</strong>: 1,000 queries per year</div>
+        </div>
+
+        <button data-discover-plan="professional"
+           class="mt-8 w-full text-center px-6 py-3 rounded-2xl border border-[#2c2e38] hover:border-[#3b82f6] text-sm font-medium transition-all">
+          Get Professional
+        </button>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="bg-[#121317] border border-[#3b82f6]/40 rounded-3xl p-8 flex flex-col relative">
+        <div class="absolute -top-3 right-6 text-[10px] tracking-[2px] bg-[#3b82f6] text-black px-3 py-0.5 rounded-full font-semibold">RECOMMENDED FOR SCALE</div>
+        
+        <div>
+          <div class="text-sm font-semibold tracking-[1px] text-[#3b82f6]">ENTERPRISE</div>
+          <div class="mt-4 flex items-baseline gap-1">
+            <span class="text-5xl font-semibold tracking-tighter">$12,000</span>
+            <span class="text-[#a1a1aa]">/ year</span>
+          </div>
+          <div class="text-xs text-[#a1a1aa] mt-1">8 users • 18,000 leads</div>
+        </div>
+
+        <div class="mt-8 space-y-3 text-sm flex-1">
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> Everything in Professional</div>
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> 8 user seats</div>
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> <strong>Unlimited Rex voice</strong></div>
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> First access to new counties + features</div>
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> Priority path + discounted access to the full Voice CRM platform</div>
+          <div class="flex gap-3"><span class="text-[#3b82f6]">•</span> Quarterly reviews + priority support</div>
+        </div>
+
+        <button data-discover-plan="enterprise"
+           class="mt-8 w-full text-center px-6 py-3 rounded-2xl bg-white text-[#0b0c10] hover:bg-[#f4f4f5] text-sm font-semibold transition-all">
+          Get Enterprise
+        </button>
+      </div>
+
+    </div>
+
+    <div class="text-center text-xs text-[#71717a] mt-6">
+      Private access only. All plans are annual prepaid. Contact for demo and onboarding.
+    </div>
+
+    <div class="mt-8 flex justify-center">
+      <button onclick="showTierComparison()" 
+              class="text-sm text-[#a1a1aa] hover:text-white underline decoration-[#3b82f6]/40 hover:decoration-[#3b82f6] transition-colors">
+        View full tier comparison
+      </button>
+    </div>
+
+    <div class="mt-10 text-center text-xs text-[#a1a1aa]">
+      All plans are annual prepaid. Credits roll over year to year. No monthly subscriptions. Enterprise unlocks the clearest path into the full Voice CRM platform.
+    </div>
+  </div>
+
+  <!-- Full Tier Comparison Modal -->
+  <div id="tier-modal" class="hidden fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex items-center justify-center p-6" onclick="hideTierComparison()">
+    <div class="bg-[#121317] border border-[#2c2e38] rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-auto" onclick="event.stopImmediatePropagation()">
+      
+      <div class="flex items-center justify-between border-b border-[#2c2e38] px-8 py-5 sticky top-0 bg-[#121317] z-10">
+        <div>
+          <div class="text-xs tracking-[3px] text-[#a1a1aa]">COMPARE PLANS</div>
+          <div class="text-2xl font-semibold tracking-tighter">DXR Discover: All Tiers</div>
+        </div>
+        <button onclick="hideTierComparison()" class="text-3xl leading-none text-[#a1a1aa] hover:text-white">×</button>
+      </div>
+
+      <div class="p-8">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-[#2c2e38]">
+              <th class="text-left py-4 pr-6 font-medium text-[#a1a1aa]">Feature</th>
+              <th class="text-center py-4 px-4 font-medium">Essentials</th>
+              <th class="text-center py-4 px-4 font-medium">Professional</th>
+              <th class="text-center py-4 pl-4 font-medium text-[#3b82f6]">Enterprise</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#2c2e38]">
+            <tr>
+              <td class="py-4 pr-6 font-medium">Annual Price</td>
+              <td class="py-4 px-4 text-center">$4,800</td>
+              <td class="py-4 px-4 text-center">$7,200</td>
+              <td class="py-4 pl-4 text-center font-semibold text-[#3b82f6]">$12,000</td>
+            </tr>
+            <tr>
+              <td class="py-4 pr-6 font-medium">User Seats</td>
+              <td class="py-4 px-4 text-center">3</td>
+              <td class="py-4 px-4 text-center">5</td>
+              <td class="py-4 pl-4 text-center font-semibold">8</td>
+            </tr>
+            <tr>
+              <td class="py-4 pr-6 font-medium">Fresh Leads per Year</td>
+              <td class="py-4 px-4 text-center">2,500</td>
+              <td class="py-4 px-4 text-center">7,500</td>
+              <td class="py-4 pl-4 text-center font-semibold">18,000</td>
+            </tr>
+            <tr>
+              <td class="py-4 pr-6 font-medium">Rex Voice</td>
+              <td class="py-4 px-4 text-center text-[#a1a1aa]">–</td>
+              <td class="py-4 px-4 text-center">1,000 queries / year</td>
+              <td class="py-4 pl-4 text-center font-semibold text-[#3b82f6]">Unlimited</td>
+            </tr>
+            <tr>
+              <td class="py-4 pr-6 font-medium">Batch Enrichment</td>
+              <td class="py-4 px-4 text-center text-[#a1a1aa]">Standard</td>
+              <td class="py-4 px-4 text-center">Priority</td>
+              <td class="py-4 pl-4 text-center font-semibold">Priority + Overnight</td>
+            </tr>
+            <tr>
+              <td class="py-4 pr-6 font-medium">New Counties & Features</td>
+              <td class="py-4 px-4 text-center text-[#a1a1aa]">Standard access</td>
+              <td class="py-4 px-4 text-center">Standard access</td>
+              <td class="py-4 pl-4 text-center font-semibold text-[#3b82f6]">First access</td>
+            </tr>
+            <tr>
+              <td class="py-4 pr-6 font-medium">Export Quality</td>
+              <td class="py-4 px-4 text-center">Standard CSV</td>
+              <td class="py-4 px-4 text-center">Enhanced formats</td>
+              <td class="py-4 pl-4 text-center font-semibold">Enhanced + API-ready</td>
+            </tr>
+            <tr>
+              <td class="py-4 pr-6 font-medium">Full Voice CRM Platform</td>
+              <td class="py-4 px-4 text-center text-[#a1a1aa]">–</td>
+              <td class="py-4 px-4 text-center text-[#a1a1aa]">–</td>
+              <td class="py-4 pl-4 text-center font-semibold text-[#3b82f6]">Priority access & discounted seats</td>
+            </tr>
+            <tr>
+              <td class="py-4 pr-6 font-medium">Support</td>
+              <td class="py-4 px-4 text-center">Standard</td>
+              <td class="py-4 px-4 text-center">Priority</td>
+              <td class="py-4 pl-4 text-center font-semibold">Dedicated + Quarterly reviews</td>
+            </tr>
+            <tr>
+              <td class="py-4 pr-6 font-medium">Billing Model</td>
+              <td class="py-4 px-4 text-center" colspan="3">Annual prepaid credits. No monthly subscriptions. Credits roll over.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="mt-8 text-xs text-[#a1a1aa] max-w-2xl">
+          Enterprise is the only tier with a clear, discounted path into the full Voice CRM platform. The production CRM is currently being rebuilt for higher value delivery. Enterprise buyers get early access and input as improvements ship.
+        </div>
+
+      </div>
+
+      <div class="border-t border-[#2c2e38] px-8 py-5 flex justify-end gap-3 sticky bottom-0 bg-[#121317]">
+        <button onclick="hideTierComparison()" 
+                class="px-6 py-2.5 text-sm border border-[#2c2e38] rounded-2xl hover:border-[#3b82f6]">
+          Close
+        </button>
+        <a href="https://calendly.com/ibs_lasvegas/dxr-discover-demo" target="_blank" 
+           class="px-6 py-2.5 text-sm bg-white text-[#0b0c10] rounded-2xl font-semibold hover:bg-[#f4f4f5]">
+          Request private walkthrough
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Visual Punch -->
+  <div class="relative w-full h-[580px] flex items-center justify-center overflow-hidden">
+    <img 
+      src="./assets/modern-architecture-house-with-palm-trees-at-twili-2026-01-07-23-12-34-utc.jpg" 
+      alt="Modern high-end home at twilight" 
+      class="absolute inset-0 w-full h-full object-cover brightness-[0.58] contrast-[1.1] saturate-[1.05]"
+    >
+    <div class="absolute inset-0 bg-gradient-to-b from-[#0b0c10]/80 via-[#0b0c10]/30 to-[#0b0c10]/85"></div>
+    
+    <div class="relative z-10 text-center px-6">
+      <div class="text-xs tracking-[4px] text-[#a1a1aa] mb-4">THE REAL EDGE</div>
+      <div class="text-[56px] md:text-6xl font-semibold tracking-[-2.8px] leading-[0.95] text-white max-w-4xl">
+        Most people are still<br>making decisions with<br>information that was<br>already stale when they got it.
+      </div>
+    </div>
+  </div>
+
+  <!-- About -->
+  <div id="about" class="max-w-4xl mx-auto px-8 py-20 border-t border-[#2c2e38]">
+    <div class="text-center mb-10">
+      <div class="text-xs font-semibold tracking-[3px] text-[#a1a1aa]">ABOUT</div>
+      <div class="text-4xl font-semibold tracking-tighter mt-2">Innovative Blockchain Solutions</div>
+    </div>
+
+    <div class="text-[#a1a1aa] text-[15px] leading-relaxed max-w-2xl mx-auto text-center">
+      <p>We build on-chain systems for real-world industries: lending, logistics, mortgage, voice intelligence, and paid data. Every product runs on Base.</p>
+    </div>
+
+    <div class="mt-10 flex flex-col items-center gap-4 text-sm">
+      <a href="https://www.linkedin.com/in/luisocadiz" target="_blank" class="hover:text-white transition-colors">Luis Ocádiz – Personal LinkedIn</a>
+      <a href="https://innovativeblockchainsolutions.live" target="_blank" class="hover:text-white transition-colors">innovativeblockchainsolutions.live</a>
+      <a href="mailto:support@innovativeblockchainsolutions.live" class="hover:text-white transition-colors">support@innovativeblockchainsolutions.live</a>
+    </div>
+  </div>
+
+  <!-- Final CTA -->
+  <div id="cta" class="border-t border-[#2c2e38] py-20">
+    <div class="max-w-2xl mx-auto text-center px-8">
+      <div class="text-5xl font-semibold tracking-tighter leading-none mb-4">Stop chasing yesterday’s leads.</div>
+      <p class="text-xl text-[#a1a1aa]">Get today’s filings with the intelligence that actually moves the needle.</p>
+      
+      <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="https://calendly.com/ibs_lasvegas/dxr-discover-demo" target="_blank" 
+           class="inline-block px-10 py-4 text-lg font-semibold rounded-3xl bg-white text-[#0b0c10] hover:bg-[#f4f4f5] transition-all active:scale-[0.985]">
+          Request private demo
+        </a>
+        <a href="https://cortexibs.com/grid.html" 
+           class="inline-flex items-center gap-2 px-8 py-4 text-lg font-medium rounded-3xl border border-[#2c2e38] hover:border-[#3b82f6] hover:text-[#3b82f6] transition-all">
+          Explore all Cortex demos <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+      <div class="text-xs text-[#71717a] mt-4">Limited spots available for Q1 2026</div>
+    </div>
+  </div>
+
+  <script>
+    // Subtle Three.js hero background
+    function initHeroThree() {
+      const container = document.getElementById('hero-three');
+      if (!container) return;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      
+      renderer.setSize(window.innerWidth, 620);
+      container.appendChild(renderer.domElement);
+
+      camera.position.z = 5;
+
+      // Elegant particle field
+      const particles = 800;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particles * 3);
+      const colors = new Float32Array(particles * 3);
+
+      for (let i = 0; i < particles; i++) {
+        const x = (Math.random() - 0.5) * 14;
+        const y = (Math.random() - 0.5) * 8;
+        const z = (Math.random() - 0.5) * 6;
+        
+        positions[i * 3] = x;
+        positions[i * 3 + 1] = y;
+        positions[i * 3 + 2] = z;
+
+        const color = new THREE.Color().setHSL(0, 0, 0.92);
+        colors[i * 3] = color.r;
+        colors[i * 3 + 1] = color.g;
+        colors[i * 3 + 2] = color.b;
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const material = new THREE.PointsMaterial({
+        size: 0.028,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.7,
+        blending: THREE.AdditiveBlending
+      });
+
+      const points = new THREE.Points(geometry, material);
+      scene.add(points);
+
+      let mouseX = 0, mouseY = 0;
+      document.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+        mouseY = -(e.clientY / 620) * 2 + 1;
+      });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        points.rotation.y = mouseX * 0.3;
+        points.rotation.x = mouseY * 0.2;
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, 620);
+        camera.aspect = window.innerWidth / 620;
+        camera.updateProjectionMatrix();
+      });
+    }
+
+    // Simple nav scroll effect
+    function initNav() {
+      const nav = document.getElementById('nav');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 30) {
+          nav.classList.add('nav-scrolled');
+        } else {
+          nav.classList.remove('nav-scrolled');
+        }
+      });
+    }
+
+    // Premium accordion for FAQ. Only one open at a time.
+    function toggleFAQ(button) {
+      const item = button.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+
+      // Close everything first
+      document.querySelectorAll('.faq-item').forEach(el => {
+        el.classList.remove('open');
+      });
+
+      if (!isOpen) {
+        item.classList.add('open');
       }
     }
-  }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
-  els.forEach(el => io.observe(el));
-})();
-</script>
 
+    // Tier comparison modal
+    function showTierComparison() {
+      document.getElementById('tier-modal').classList.remove('hidden');
+      document.getElementById('tier-modal').classList.add('flex');
+    }
+    function hideTierComparison() {
+      const modal = document.getElementById('tier-modal');
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+
+    // Modern mouse-tilt effect on Intelligence Layer logos (premium interactive life)
+    function initIntelligenceLayer() {
+      const grid = document.getElementById('intelligence-grid');
+      if (!grid) return;
+
+      const cards = Array.from(grid.children);
+
+      cards.forEach(card => {
+        card.style.transition = 'transform 0.2s ease-out, box-shadow 0.2s ease-out';
+        card.style.willChange = 'transform';
+
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+          const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+
+          const rotateX = (-y * 8).toFixed(2);
+          const rotateY = (x * 10).toFixed(2);
+
+          card.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+          card.style.boxShadow = '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)';
+        });
+
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)';
+          card.style.boxShadow = 'none';
+        });
+      });
+    }
+
+    // Boot everything
+    function init() {
+      initHeroThree();
+      initNav();
+      initIntelligenceLayer();
+      initSectionContrastEffects();
+      initDiscoverStripe();
+    }
+
+    // Scroll-in white background + black text effect ONLY for the System section
+    function initSectionContrastEffects() {
+      const systemSection = document.getElementById('the-system');
+      if (!systemSection) return;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            systemSection.classList.add('system-white');
+          } else {
+            systemSection.classList.remove('system-white');
+          }
+        });
+      }, { threshold: 0.55 });
+
+      observer.observe(systemSection);
+    }
+
+    function initDiscoverStripe() {
+      // Payment buttons disabled and payment site nuked per request.
+      // CTAs now point to private access only.
+      document.querySelectorAll('[data-discover-plan]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          window.open('https://calendly.com/ibs_lasvegas/dxr-discover-demo', '_blank');
+        });
+        btn.textContent = 'Contact for Access';
+      });
+    }
+
+    window.onload = init;
+  </script>
+
+  <!-- Minimal login modal (self-contained) -->
+  <div id="loginModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center" style="background: rgba(0,0,0,0.6);">
+    <div class="w-full max-w-sm mx-4 rounded-3xl border border-[#2c2e38] bg-[#0b0c10] p-8">
+      <div class="text-xl font-semibold tracking-tight mb-6">Log in to DXR Discover</div>
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <input type="email" id="loginEmail" placeholder="Email" required
+                 class="w-full rounded-2xl border border-[#2c2e38] bg-[#121317] px-4 py-3 text-sm outline-none focus:border-[#3b82f6]">
+        </div>
+        <div>
+          <input type="password" id="loginPassword" placeholder="Password" required
+                 class="w-full rounded-2xl border border-[#2c2e38] bg-[#121317] px-4 py-3 text-sm outline-none focus:border-[#3b82f6]">
+        </div>
+        <button type="submit"
+                class="w-full rounded-2xl bg-white py-3 text-sm font-semibold text-[#0b0c10] hover:bg-[#f4f4f5] transition">
+          Log in
+        </button>
+      </form>
+      <div id="loginError" class="hidden mt-4 text-sm text-[#ef4444]"></div>
+      <div class="mt-4 text-center">
+        <button onclick="hideLoginModal()" class="text-sm text-[#a1a1aa] hover:text-white">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    let supabaseClient = null;
+
+    async function getSupabase() {
+      if (supabaseClient) return supabaseClient;
+      const { discoverSupabase } = await import('./auth.js');
+      supabaseClient = discoverSupabase;
+      return supabaseClient;
+    }
+
+    window.showLoginModal = function() {
+      document.getElementById('loginModal').classList.remove('hidden');
+      document.getElementById('loginModal').classList.add('flex');
+      document.getElementById('loginError').classList.add('hidden');
+    };
+
+    window.hideLoginModal = function() {
+      document.getElementById('loginModal').classList.add('hidden');
+      document.getElementById('loginModal').classList.remove('flex');
+    };
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById('loginError');
+      errorEl.classList.add('hidden');
+
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const client = await getSupabase();
+        const { error } = await client.auth.signInWithPassword({ email, password });
+        if (error) {
+          errorEl.textContent = error.message || 'Login failed';
+          errorEl.classList.remove('hidden');
+          return;
+        }
+        // Success — redirect to the protected tool (localhost for dev testing until the real tool is deployed)
+        window.location.href = 'http://localhost:8000/dealxradar/discover.html';
+      } catch (err) {
+        errorEl.textContent = 'Login failed. Please try again.';
+        errorEl.classList.remove('hidden');
+      }
+    });
+  </script>
 </body>
 </html>
