@@ -1720,7 +1720,7 @@
           errorEl.classList.remove('hidden');
           return;
         }
-        // Success — redirect to the protected tool (localhost for dev testing until the real tool is deployed)
+        // Success — redirect to the protected tool
         window.location.href = 'http://localhost:8000/dealxradar/discover.html';
       } catch (err) {
         errorEl.textContent = 'Login failed. Please try again.';
