@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DXR Discover · Checkout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
+    
+    :root {
+      --bg: #0b0c10;
+      --surface: #121317;
+      --surface-2: #1a1b22;
+      --border: #2c2e38;
+      --text: #f8f9fc;
+      --muted: #a1a1aa;
+      --accent: #3b82f6;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    
+    .font-display {
+      font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+      font-feature-settings: "ss01";
+    }
+
+    .checkout-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+    }
+
+    .plan-summary {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+    }
+
+    #payment-element {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem;
+      min-height: 300px;
+    }
+
+    .btn-primary {
+      background: #fff;
+      color: var(--bg);
+      font-weight: 600;
+      border-radius: 9999px;
+      transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      background: #f4f4f5;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status {
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      display: none;
+    }
+    .status.show {
+      display: block;
+    }
+    .status.error {
+      background: rgba(255, 68, 85, 0.1);
+      border: 1px solid rgba(255, 68, 85, 0.35);
+      color: #fca5a5;
+    }
+    .status.info {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+    }
+
+    /* Premium payment terminal life */
+    #paymentElementWrapper {
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    #paymentElementWrapper.has-focus {
+      box-shadow: 0 0 0 1px #3b82f6, 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Animated checkmark */
+    #successCheckPath {
+      transition: stroke-dashoffset 800ms cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .success-check-animated #successCheckPath {
+      stroke-dashoffset: 0;
+    }
+  </style>
+</head>
+<body class="bg-[#0b0c10] text-[#f8f9fc] min-h-screen" 
+      style="background-image: url('./assets/black-data-flow-bg.jpg'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat;">
+  
+  <!-- Subtle dark overlay so the payment terminal remains highly readable -->
+  <div class="fixed inset-0 bg-gradient-to-b from-[#0b0c10]/85 via-[#0b0c10]/75 to-[#0b0c10]/80 pointer-events-none"></div>
+
+  <!-- Top Bar -->
+  <div class="border-b border-[#2c2e38] relative z-10">
+    <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="./assets/dxr-discover-logo.png" alt="DXR Discover" class="h-8 w-auto">
+        <div>
+          <span class="font-semibold text-xl tracking-[-1px]">DXR</span>
+          <span class="font-medium text-lg text-[#a1a1aa]">Discover</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <span id="userEmail" class="text-xs font-mono text-[#71717a]"></span>
+        <button id="signoutBtn"
+                class="text-xs px-3 py-1.5 rounded-lg border border-[#2c2e38] text-[#a1a1aa] hover:text-white hover:border-[#3b82f6] transition-colors">
+          Sign out
+        </button>
+        <a href="./index.html" class="text-sm text-[#a1a1aa] hover:text-white transition-colors pl-2">← Back</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment site nuked per request. Payment flow fully disabled. -->
+  <div class="max-w-4xl mx-auto px-6 py-24 text-center">
+    <div class="text-4xl font-semibold tracking-tighter mb-4">Payment Flow Disabled</div>
+    <p class="text-[#a1a1aa] max-w-md mx-auto">This payment site has been removed. Private access to DXR Discover is available by direct inquiry only.</p>
+    <div class="mt-8">
+      <a href="https://calendly.com/ibs_lasvegas/dxr-discover-demo" target="_blank"
+         class="inline-block px-8 py-3 rounded-2xl bg-white text-[#0b0c10] font-semibold hover:bg-[#f4f4f5]">
+        Request Private Access
+      </a>
+    </div>
+    <div class="mt-6 text-xs text-[#71717a]">
+      <a href="./index.html" class="hover:text-white">← Back to DXR Discover</a>
+    </div>
+  </div>
+    <!-- Payment site nuked. Leftover grid removed. -->
+      <div class="md:col-span-2">
+        <div class="plan-summary p-6 sticky top-6">
+          <div class="text-xs font-semibold tracking-[2px] text-[#a1a1aa] mb-2">YOUR PLAN</div>
+          <div id="planName" class="text-3xl font-semibold tracking-tighter mb-1"></div>
+          <div id="planPrice" class="text-4xl font-semibold tracking-tighter text-white mb-4"></div>
+          
+          <div class="space-y-2 text-sm text-[#a1a1aa]">
+            <div id="planUsers"></div>
+            <div id="planLeads"></div>
+          </div>
+
+          <div class="mt-6 pt-6 border-t border-[#2c2e38] text-xs text-[#71717a]">
+            Annual prepaid. Credits roll over. No monthly surprises.
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment -->
+      <div class="md:col-span-3">
+        <div class="checkout-card p-8">
+          <div class="mb-6">
+            <div class="text-xs font-semibold tracking-[3px] text-[#a1a1aa] mb-2">SECURE CHECKOUT</div>
+            <div class="text-2xl font-semibold tracking-tighter">Complete your purchase</div>
+          </div>
+
+          <!-- Payment Element -->
+          <div id="paymentCard">
+            <!-- Loading Skeleton -->
+            <div id="paymentSkeleton" class="mb-6">
+              <div class="h-12 bg-[#1a1b22] rounded-xl mb-3 animate-pulse"></div>
+              <div class="h-12 bg-[#1a1b22] rounded-xl mb-3 animate-pulse"></div>
+              <div class="h-12 bg-[#1a1b22] rounded-xl w-3/4 animate-pulse"></div>
+            </div>
+
+            <!-- Real Payment Element -->
+            <div id="paymentElementWrapper" class="hidden mb-6">
+              <div id="payment-element" 
+                   class="transition-all duration-300 rounded-2xl border border-[#2c2e38] focus-within:border-[#3b82f6] focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.1)]">
+              </div>
+            </div>
+            
+            <button id="payButton" disabled
+                    class="btn-primary w-full py-4 text-lg font-semibold flex items-center justify-center gap-2">
+              <span id="payButtonText">Pay <span id="payAmount"></span></span>
+              <svg id="paySpinner" class="hidden animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+            </button>
+            
+            <div class="mt-4 text-center">
+              <div class="text-[10px] text-[#71717a] tracking-widest">Powered by Stripe • Link, Apple Pay & Google Pay supported</div>
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div id="statusMsg" class="status hidden mt-4"></div>
+
+          <!-- Success State -->
+          <div id="successBlock" class="hidden text-center py-8">
+            <div class="mx-auto w-20 h-20 mb-6">
+              <svg id="successCheck" class="w-20 h-20 text-emerald-400" fill="none" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" opacity="0.2"/>
+                <path id="successCheckPath" 
+                      stroke="currentColor" 
+                      stroke-width="2.5" 
+                      stroke-linecap="round" 
+                      stroke-linejoin="round" 
+                      d="M5 13l4 4L19 7"
+                      stroke-dasharray="24"
+                      stroke-dashoffset="24"/>
+              </svg>
+            </div>
+            <div class="text-3xl font-semibold tracking-tighter mb-3">Payment received</div>
+            <p class="text-[#a1a1aa] mb-8 max-w-xs mx-auto">Access granted. Set up your company and invite your team. They receive access after email verification.</p>
+            
+            <a href="./setup.html" 
+               class="inline-block px-8 py-3.5 rounded-2xl bg-white text-[#0b0c10] font-semibold hover:bg-[#f4f4f5] transition-all text-sm tracking-wider">
+              CONTINUE TO SETUP →
+            </a>
+          </div>
+        </div>
+
+        <div class="text-center mt-6 text-xs text-[#71717a]">
+          Payments processed securely by Stripe. Your card details never touch our servers.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Production path (live site only) -->
+  <script type="module">
+    const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.port === '8001';
+    if (!isLocal) {
+      try {
+        const auth = await import('./auth.js');
+        const { discoverAuthFetch, discoverSignOut, discoverSupabase, SUPABASE_URL, SUPABASE_ANON_KEY } = auth;
+
+        const params = new URLSearchParams(window.location.search);
+        const planSlug = (params.get('plan') || 'professional').toLowerCase();
+
+        const PLANS = {
+          essentials:   { name: 'Essentials',   displayPrice: '$4,800' },
+          professional: { name: 'Professional', displayPrice: '$7,200' },
+          enterprise:   { name: 'Enterprise',   displayPrice: '$12,000' }
+        };
+        const plan = PLANS[planSlug] || PLANS.professional;
+
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        set('planName', plan.name);
+        set('planPrice', plan.displayPrice);
+        set('payAmount', plan.displayPrice);
+
+        let stripeInstance = null;
+        let elementsInstance = null;
+        let paymentElementInstance = null;
+
+        async function initializePaymentUI() {
+          if (stripeInstance) return; // already initialized
+
+          // All dxr-stripe / backend connections have been nuked for complete isolation.
+          // Using placeholder for standalone frontend mode.
+          const intentData = { client_secret: 'pi_standalone_mode_placeholder' };
+
+          stripeInstance = Stripe(cfg.publishable_key);
+          elementsInstance = stripeInstance.elements({
+            clientSecret: intentData.client_secret,
+            appearance: {
+              theme: 'night',
+              variables: {
+                colorPrimary: '#3b82f6',
+                colorBackground: '#121317',
+                colorText: '#f8f9fc',
+                colorDanger: '#ff4455',
+                fontFamily: 'Inter, system-ui, sans-serif',
+                borderRadius: '12px'
+              }
+            }
+          });
+
+          paymentElementInstance = elementsInstance.create('payment', { layout: { type: 'tabs', defaultCollapsed: false } });
+
+          document.getElementById('paymentSkeleton').style.display = 'none';
+          const wrapper = document.getElementById('paymentElementWrapper');
+          wrapper.classList.remove('hidden');
+          wrapper.style.opacity = '0';
+          await paymentElementInstance.mount('#payment-element');
+          wrapper.style.opacity = '1';
+
+          const payBtn = document.getElementById('payButton');
+          payBtn.disabled = false;
+        }
+
+        // Optional top bar
+        const { data: { session: initialSession } } = await discoverSupabase.auth.getSession();
+        if (initialSession?.user) {
+          const emailEl = document.getElementById('userEmail');
+          if (emailEl) emailEl.textContent = initialSession.user.email || '';
+          const so = document.getElementById('signoutBtn');
+          if (so) so.addEventListener('click', () => discoverSignOut());
+
+          // Already signed in — safe to init payment immediately
+          await initializePaymentUI();
+        } else {
+          // No session yet — show the payment area but keep pay disabled until we have a session
+          document.getElementById('paymentSkeleton').style.display = 'none';
+          const wrapper = document.getElementById('paymentElementWrapper');
+          wrapper.classList.remove('hidden');
+          wrapper.innerHTML = `
+            <div class="rounded-2xl border border-[#2c2e38] bg-[#121317] p-8 text-center">
+              <div class="text-lg font-semibold mb-2">Sign in to complete your purchase</div>
+              <div class="text-sm text-[#a1a1aa] mb-4">You will be returned here after signing in.</div>
+              <button id="signInToPayBtn"
+                      class="btn-primary w-full py-3 text-base font-semibold">
+                SIGN IN TO PAY
+              </button>
+            </div>
+          `;
+          const signInBtn = document.getElementById('signInToPayBtn');
+          if (signInBtn) {
+            signInBtn.addEventListener('click', () => {
+              const current = location.pathname + location.search;
+              location.href = `/discover/login.html?return=${encodeURIComponent(current)}`;
+            });
+          }
+        }
+
+        // Listen for session appearing (handles the login resume case cleanly)
+        discoverSupabase.auth.onAuthStateChange(async (event, session) => {
+          if (session?.user && !stripeInstance) {
+            // We now have a session (either just logged in or restored) — initialize the real payment UI
+            const payBtn = document.getElementById('payButton');
+            if (payBtn) payBtn.disabled = true;
+
+            // Clean up the "sign in" placeholder if it exists
+            const placeholder = document.querySelector('#paymentElementWrapper > div');
+            if (placeholder) placeholder.remove();
+
+            await initializePaymentUI();
+          }
+        });
+
+        // Pay button handler (only reaches here for users who had session at load)
+        const payBtn = document.getElementById('payButton');
+        if (payBtn) {
+          payBtn.addEventListener('click', async () => {
+            if (!stripeInstance || !elementsInstance) {
+              // Safety: should not happen, but redirect if somehow no session
+              const current = location.pathname + location.search;
+              location.href = `/discover/login.html?return=${encodeURIComponent(current)}`;
+              return;
+            }
+
+            payBtn.disabled = true;
+            const { error, paymentIntent } = await stripeInstance.confirmPayment({ elements: elementsInstance, redirect: 'if_required' });
+            if (error) {
+              alert(error.message);
+              payBtn.disabled = false;
+              return;
+            }
+            if (paymentIntent?.status === 'succeeded') {
+              // dxr-stripe confirm connection removed for isolation. No-op in standalone mode.
+
+              try { await discoverSupabase.auth.refreshSession(); } catch {}
+
+              document.getElementById('paymentCard').style.display = 'none';
+              document.querySelector('.plan-summary').style.display = 'none';
+              const success = document.getElementById('successBlock');
+              success.style.display = 'block';
+              success.classList.add('success-check-animated');
+            }
+          });
+        }
+      } catch (e) {
+        console.error('[checkout prod]', e);
+      }
+    }
+  </script>
+</body>
+</html>

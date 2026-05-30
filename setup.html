@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DXR Discover · Team Setup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0b0c10;
+      color: #f8f9fc;
+    }
+    
+    .setup-card {
+      background: #121317;
+      border: 1px solid #2c2e38;
+      border-radius: 24px;
+    }
+
+    .member-row {
+      background: #1a1b22;
+      border: 1px solid #2c2e38;
+      border-radius: 16px;
+    }
+
+    .tmobile-flag {
+      background: #3b82f6;
+      color: white;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 999px;
+    }
+
+    .btn-primary {
+      background: #fff;
+      color: #0b0c10;
+      font-weight: 600;
+      border-radius: 9999px;
+      transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      background: #f4f4f5;
+      transform: translateY(-1px);
+    }
+
+    .status {
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body class="min-h-screen" 
+      style="background-image: url('./assets/black-data-flow-bg.jpg'); background-size: cover; background-position: center; background-attachment: fixed;">
+  
+  <div class="fixed inset-0 bg-gradient-to-b from-[#0b0c10]/85 via-[#0b0c10]/75 to-[#0b0c10]/80 pointer-events-none"></div>
+
+  <!-- Top Bar -->
+  <div class="border-b border-[#2c2e38] relative z-10">
+    <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="./assets/dxr-discover-logo.png" alt="DXR Discover" class="h-8 w-auto">
+        <div>
+          <span class="font-semibold text-xl tracking-[-1px]">DXR</span>
+          <span class="font-medium text-lg text-[#a1a1aa]">Discover</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <span id="userEmail" class="text-xs font-mono text-[#71717a]"></span>
+        <button id="signoutBtn" class="text-xs px-3 py-1.5 rounded-lg border border-[#2c2e38] text-[#a1a1aa] hover:text-white hover:border-[#3b82f6]">
+          Sign out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment site nuked per request. Onboarding disabled. -->
+  <div class="max-w-3xl mx-auto px-6 py-24 text-center relative z-10">
+    <div class="text-4xl font-semibold tracking-tighter mb-4">Onboarding Disabled</div>
+    <p class="text-[#a1a1aa] max-w-md mx-auto">Team setup and invites have been removed. Private access to DXR Discover only.</p>
+    <div class="mt-8">
+      <a href="https://calendly.com/ibs_lasvegas/dxr-discover-demo" target="_blank"
+         class="inline-block px-8 py-3 rounded-2xl bg-white text-[#0b0c10] font-semibold">Request Private Access</a>
+    </div>
+    <div class="mt-6 text-xs"><a href="./index.html" class="text-[#a1a1aa] hover:text-white">← Back to DXR Discover</a></div>
+  </div>
+      <div class="mb-8">
+        <div class="text-xs font-semibold tracking-[3px] text-[#3b82f6] mb-2">POST-PAYMENT SETUP</div>
+        <div class="text-3xl font-semibold tracking-tighter">Set up your DXR Discover team</div>
+        <div class="text-[#a1a1aa] mt-2 text-sm">Add your company and the people who need access. Email is always sent. SMS is only attempted for non-T-Mobile numbers.</div>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-xs font-semibold tracking-[2px] text-[#a1a1aa] mb-2">COMPANY NAME</label>
+        <input id="companyName" type="text" class="w-full bg-[#0b0c10] border border-[#2c2e38] rounded-2xl px-4 py-3 text-lg focus:outline-none focus:border-[#3b82f6]" placeholder="Acme Capital">
+      </div>
+
+      <div class="mb-6">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <div class="text-xs font-semibold tracking-[2px] text-[#a1a1aa]">TEAM MEMBERS</div>
+            <div id="seatCounter" class="text-[10px] text-[#3b82f6]"></div>
+          </div>
+          <button onclick="addMemberRow()" class="text-xs px-3 py-1.5 rounded-lg border border-[#2c2e38] hover:border-[#3b82f6] text-[#a1a1aa] hover:text-white">
+            + Add Person
+          </button>
+        </div>
+
+        <div id="membersContainer" class="space-y-3"></div>
+      </div>
+
+      <button id="inviteBtn" onclick="sendInvites()" class="btn-primary w-full py-4 text-lg font-semibold">
+        INVITE TEAM
+      </button>
+
+      <div id="statusMsg" class="status hidden mt-4"></div>
+    </div>
+
+    <div class="text-center mt-6 text-xs text-[#71717a]">
+      Invited users will receive an email (and SMS if eligible) with a link to verify and activate access.
+    </div>
+  </div>
+
+  <script type="module">
+    import { discoverSupabase, discoverAuthGuard, discoverSignOut, SUPABASE_URL } from './auth.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const planSlug = (params.get('plan') || 'professional').toLowerCase();
+
+    const SEAT_LIMITS = { essentials: 3, professional: 5, enterprise: 8 };
+    let seatLimit = SEAT_LIMITS[planSlug] || 5;
+    let currentMembers = 0;
+
+    const user = await discoverAuthGuard({ next: window.location.href });
+    if (!user) throw new Error('redirected');
+
+    document.getElementById('userEmail').textContent = user.email || '';
+    document.getElementById('signoutBtn').addEventListener('click', () => discoverSignOut());
+
+    function updateSeatCounter() {
+      const el = document.getElementById('seatCounter');
+      el.textContent = `${currentMembers} / ${seatLimit} seats used`;
+      el.style.color = currentMembers >= seatLimit ? '#f87171' : '#3b82f6';
+    }
+
+    function isTmobileNumber(phone) {
+      if (!phone) return false;
+      const digits = phone.replace(/\D/g, '');
+      const area = digits.slice(0, 3);
+      const tmobileAreas = ['210','214','254','281','325','346','361','409','430','432','469','512','682','713','726','737','806','817','830','832','903','915','936','940','956','972','979'];
+      return tmobileAreas.includes(area);
+    }
+
+    function addMemberRow() {
+      const container = document.getElementById('membersContainer');
+      if (currentMembers >= seatLimit) {
+        alert(`Maximum ${seatLimit} seats for this plan.`);
+        return;
+      }
+
+      const row = document.createElement('div');
+      row.className = 'member-row p-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-center';
+      row.innerHTML = `
+        <div class="md:col-span-5">
+          <input type="email" class="member-email w-full bg-[#0b0c10] border border-[#2c2e38] rounded-xl px-3 py-2 text-sm" placeholder="Email *">
+        </div>
+        <div class="md:col-span-3 relative">
+          <input type="tel" class="member-phone w-full bg-[#0b0c10] border border-[#2c2e38] rounded-xl px-3 py-2 text-sm" placeholder="Phone (optional)">
+          <div class="tmobile-flag absolute right-2 top-2 hidden" style="font-size:9px;padding:0 4px;">T-Mobile → email only</div>
+        </div>
+        <div class="md:col-span-3">
+          <input type="text" class="member-name w-full bg-[#0b0c10] border border-[#2c2e38] rounded-xl px-3 py-2 text-sm" placeholder="Name (optional)">
+        </div>
+        <div class="md:col-span-1 text-right">
+          <button class="text-red-400 hover:text-red-500 text-sm" onclick="removeRow(this)">✕</button>
+        </div>
+      `;
+
+      const phoneInput = row.querySelector('.member-phone');
+      const flag = row.querySelector('.tmobile-flag');
+
+      phoneInput.addEventListener('input', () => {
+        if (isTmobileNumber(phoneInput.value)) {
+          flag.classList.remove('hidden');
+        } else {
+          flag.classList.add('hidden');
+        }
+      });
+
+      container.appendChild(row);
+      currentMembers++;
+      updateSeatCounter();
+    }
+
+    window.removeRow = function(btn) {
+      btn.closest('.member-row').remove();
+      currentMembers--;
+      updateSeatCounter();
+    };
+
+    // Start with the owner as first row (pre-filled email)
+    function initFirstRow() {
+      const container = document.getElementById('membersContainer');
+      const row = document.createElement('div');
+      row.className = 'member-row p-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-center';
+      row.innerHTML = `
+        <div class="md:col-span-5">
+          <input type="email" class="member-email w-full bg-[#0b0c10] border border-[#2c2e38] rounded-xl px-3 py-2 text-sm" value="${user.email || ''}" readonly>
+        </div>
+        <div class="md:col-span-3">
+          <input type="tel" class="member-phone w-full bg-[#0b0c10] border border-[#2c2e38] rounded-xl px-3 py-2 text-sm" placeholder="Your phone (optional)">
+        </div>
+        <div class="md:col-span-3">
+          <input type="text" class="member-name w-full bg-[#0b0c10] border border-[#2c2e38] rounded-xl px-3 py-2 text-sm" value="${user.email?.split('@')[0] || ''}">
+        </div>
+        <div class="md:col-span-1"></div>
+      `;
+      container.appendChild(row);
+      currentMembers = 1;
+      updateSeatCounter();
+    }
+
+    initFirstRow();
+
+    async function sendInvites() {
+      const btn = document.getElementById('inviteBtn');
+      const status = document.getElementById('statusMsg');
+      const company = document.getElementById('companyName').value.trim();
+
+      if (!company) {
+        alert('Company name is required.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'SENDING...';
+      status.style.display = 'block';
+      status.className = 'status show info';
+      status.textContent = 'Sending invites...';
+
+      const rows = document.querySelectorAll('#membersContainer .member-row');
+      const invites = [];
+
+      rows.forEach(row => {
+        const email = row.querySelector('.member-email').value.trim();
+        if (!email) return;
+
+        const phone = row.querySelector('.member-phone').value.trim();
+        const name = row.querySelector('.member-name').value.trim();
+
+        invites.push({
+          email,
+          phone: phone || null,
+          name: name || null
+        });
+      });
+
+      try {
+        const { data: { session } } = await discoverSupabase.auth.getSession();
+
+        // dxr-discover-onboard backend call has been removed as part of full isolation.
+        // This frontend is now standalone. Replace with your own isolated backend later if needed.
+        const res = { ok: true, json: async () => ({ invites: invites.map(i => ({...i, sms_sent: false})) }) };
+
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error || 'Something went wrong');
+
+        status.className = 'status show info';
+        status.innerHTML = `Done. ${data.invites.length} invite(s) sent via email. ${data.invites.filter(i => i.sms_sent).length} also received SMS.`;
+
+        btn.textContent = 'INVITES SENT';
+      } catch (err) {
+        status.className = 'status show error';
+        status.textContent = 'Error: ' + err.message;
+        btn.disabled = false;
+        btn.textContent = 'INVITE TEAM';
+      }
+    }
+
+    window.sendInvites = sendInvites;
+  </script>
+</body>
+</html>

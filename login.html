@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORTEX Discover · Sign in</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://esm.sh/@supabase/supabase-js@2.45.0"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+    body { font-family: 'Inter', system_ui, sans-serif; }
+    .font-display { font-family: 'Space Grotesk', 'Inter', system_ui, sans-serif; }
+  </style>
+</head>
+<body class="bg-[#0b0c10] text-[#f8f9fc]" 
+      style="background-image: url('./assets/black-data-flow-bg.jpg'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat;">
+  <!-- Lighter overlay so the data flow texture is still visible behind the sign-in card -->
+  <div class="fixed inset-0 bg-gradient-to-b from-[#0b0c10]/70 via-[#0b0c10]/55 to-[#0b0c10]/65 pointer-events-none"></div>
+
+  <!-- Payment site nuked per request. Login disabled. -->
+  <div class="min-h-screen flex items-center justify-center p-6 relative z-10">
+    <div class="text-center">
+      <div class="text-3xl font-semibold tracking-tighter mb-4">Login Disabled</div>
+      <p class="text-[#a1a1aa] max-w-xs mx-auto">Payment and onboarding login has been removed. Private access only.</p>
+      <div class="mt-6">
+        <a href="https://calendly.com/ibs_lasvegas/dxr-discover-demo" target="_blank"
+           class="inline-block px-6 py-3 rounded-2xl bg-white text-[#0b0c10] font-semibold">Request Private Access</a>
+      </div>
+      <div class="mt-4 text-xs"><a href="./index.html" class="text-[#a1a1aa] hover:text-white">← Back to CORTEX Discover</a></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { discoverSupabase } from './auth.js';
+
+    const form = document.getElementById('loginForm');
+    const errorEl = document.getElementById('error');
+    const planContext = document.getElementById('planContext');
+    const planNameEl = document.getElementById('planName');
+
+    // Robust resume handling for both guard (?next=) and fetch (?return=) flows.
+    // When coming from checkout.html?plan=xxx the next/return value already contains the full target URL.
+    const urlParams = new URLSearchParams(window.location.search);
+    const directPlan = urlParams.get('plan');
+    const nextTarget = urlParams.get('next');
+    const returnTarget = urlParams.get('return');
+
+    // Show plan context banner whenever we can infer one (from direct param or baked into the resume target)
+    let inferredPlan = directPlan;
+    if (!inferredPlan && nextTarget) {
+      const m = nextTarget.match(/[?&]plan=([^&]+)/);
+      if (m) inferredPlan = decodeURIComponent(m[1]);
+    }
+    if (!inferredPlan && returnTarget) {
+      const m = returnTarget.match(/[?&]plan=([^&]+)/);
+      if (m) inferredPlan = decodeURIComponent(m[1]);
+    }
+    if (inferredPlan) {
+      const nice = inferredPlan.charAt(0).toUpperCase() + inferredPlan.slice(1);
+      planNameEl.textContent = `${nice} plan`;
+      planContext.classList.remove('hidden');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.classList.add('hidden');
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      const { error } = await discoverSupabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        errorEl.textContent = error.message || 'Login failed';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      // Priority: explicit next (from guard on checkout) > return (from discoverAuthFetch) > plan-aware index
+      if (nextTarget) {
+        window.location.href = nextTarget.startsWith('./') || nextTarget.startsWith('/') ? nextTarget : './' + nextTarget;
+        return;
+      }
+      if (returnTarget) {
+        window.location.href = returnTarget.startsWith('./') || returnTarget.startsWith('/') ? returnTarget : './' + returnTarget;
+        return;
+      }
+
+      // Handle pending invite token after login — claim the invite and grant access
+      const inviteToken = urlParams.get('invite');
+      if (inviteToken) {
+        // Backend connection for invite claim has been nuked per isolation request.
+        // For now, direct to setup.
+        window.location.href = './setup.html';
+        return;
+      }
+
+      if (inferredPlan) {
+        window.location.href = `./checkout.html?plan=${encodeURIComponent(inferredPlan)}`;
+        return;
+      }
+      window.location.href = './index.html';
+    });
+  </script>
+</body>
+</html>

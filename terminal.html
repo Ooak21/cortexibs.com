@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORTEX • Terminal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;family=Inter:wght@400;500&amp;display=swap');
+
+    :root {
+      --bg: #0a0a0f;
+      --terminal-bg: #111114;
+      --border: #2c2e38;
+      --text: #e2e2eb;
+      --accent: #3b82f6;
+      --green: #22c55e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .terminal {
+      width: 100%;
+      max-width: 1100px;
+      background: var(--terminal-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+    }
+
+    .terminal-header {
+      background: #1a1b22;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .terminal-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot.red { background: #ff5f56; }
+    .dot.yellow { background: #ffbd2e; }
+    .dot.green { background: #27c93f; }
+
+    .terminal-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #8a8f9e;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .terminal-body {
+      padding: 20px;
+      background: #0d0d11;
+    }
+
+    .terminal-line {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #8a8f9e;
+      margin-bottom: 8px;
+    }
+
+    .terminal-line .prompt {
+      color: var(--green);
+    }
+
+    .video-container {
+      position: relative;
+      background: #000;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+
+    .video-container video {
+      width: 100%;
+      display: block;
+      max-height: 70vh;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .terminal-footer {
+      padding: 12px 20px;
+      background: #1a1b22;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #6b7280;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status {
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .back-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .title {
+      font-size: 13px;
+      color: #a1a1aa;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="terminal">
+    <!-- Terminal Header -->
+    <div class="terminal-header">
+      <div class="terminal-dots">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+      </div>
+      <div class="terminal-title">
+        <i class="fas fa-terminal"></i>
+        <span>cortex@ibs</span>
+        <span style="color:#4b5563">—</span>
+        <span>Cortex-by-IBS.mp4</span>
+      </div>
+      <div></div>
+    </div>
+
+    <!-- Terminal Body -->
+    <div class="terminal-body">
+      <div class="title">CORTEX Hero Animation • 2026</div>
+      
+      <div class="video-container">
+        <video controls autoplay loop muted playsinline style="width:100%; max-height:72vh; background:#000;">
+          <source src="assets/videos/cortex-by-ibs.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <div class="terminal-line">
+        <span class="prompt">$</span> <span>playing</span> <span style="color:#f59e0b">Cortex-by-IBS.mp4</span>
+      </div>
+      <div class="terminal-line" style="opacity:0.6">
+        <span class="prompt">$</span> <span>status:</span> <span style="color:#22c55e">online</span> • autonomous execution layer
+      </div>
+    </div>
+
+    <!-- Terminal Footer -->
+    <div class="terminal-footer">
+      <div>
+        <span style="color:#22c55e">●</span> 
+        <span>Streaming from luisocadiz.online</span>
+      </div>
+      <a href="/index.html" class="back-link">
+        <i class="fas fa-arrow-left"></i> back to discover
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>
