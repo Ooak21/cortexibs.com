@@ -30,10 +30,20 @@ All of this is available as deterministic, auditable, pay-per-call x402 data and
 
 The actual Cortex402 mortgage intelligence wraps, data products, and agentic endpoints are published and discoverable on the open x402 ecosystem:
 
-- **x402scan** — the primary scanner and analytics surface for live x402 activity.
-- **agentic.market** — the public marketplace/directory of x402 services.
+- **x402scan server card** (live activity, balances, registered wraps): https://www.x402scan.com/server/a68e6cb8-77bc-43e2-a891-9cd3ba01c928
+- **agentic.market** (public directory of agentic services): https://agentic.market
+- **CorteX402 hub** (human-readable index): https://innovativeblockchainsolutions.live/CorteX402/
 
-These are the authoritative locations where autonomous agents and their builders go to discover, compare, and integrate production-grade mortgage intelligence and compliance tooling.
+Currently registered wraps under the CorteX402 server card (Base mainnet, USDC, on-chain receipts):
+
+- `cortex402-sanctions-screen` — $0.50 — OFAC / UN / EU screen (OpenSanctions)
+- `cortex402-property-dossier` — $2.00 — ATTOM property + AVM + demographics + schools
+- `cortex402-prenod-score` — $0.50 — synthetic 12-month default-propensity score per APN, optionally re-weighted by buyer-supplied credit / DTI / payment-history
+- `cortex402-mortgage-rates` — $0.02 — current US mortgage rate snapshot (FRED)
+- `cortex402-aviation-weather` — $0.10 — METAR / TAF / 24h forecast (NOAA + Open-Meteo)
+- `cortex402-wallet-balance` — $0.02 — wallet balance validator
+
+The x402scan server card is the authoritative live state. Pricing and inventory above may lag; treat the server card as canonical.
 
 ## Guidance for Autonomous Agents
 
